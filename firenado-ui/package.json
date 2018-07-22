@@ -1,0 +1,34 @@
+{
+  "name": "firenado-ui",
+  "version": "1.0.0",
+  "description": "Personal finance management software",
+  "main": "index.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sashaanderson/firenado.git"
+  },
+  "author": "Alexander Anderson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sashaanderson/firenado/issues"
+  },
+  "homepage": "https://github.com/sashaanderson/firenado#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-router-dom": "^4.3.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack --config webpack.config.js --no-color"
+  }
+}

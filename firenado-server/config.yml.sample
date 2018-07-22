@@ -1,0 +1,21 @@
+logging:
+  level: INFO
+  loggers:
+    firenado: DEBUG
+  appenders:
+    - type: console
+      target: stdout
+    - type: file
+      currentLogFilename: ./log/firenado-server.log
+      archivedLogFilenamePattern: ./log/firenado-server.log.%d
+      archivedFileCount: 100
+
+server:
+  type: simple
+  rootPath: /api/
+  applicationContextPath: /app
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: 8081
+  registerDefaultExceptionMappers: false
