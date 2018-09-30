@@ -5,7 +5,7 @@ module.exports = {
   mode: 'production',
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, '../oasys-ledger-server/src/main/resources/assets/'),
+    path: path.resolve(__dirname, '../oasis-ledger-server/src/main/resources/assets/'),
     filename: 'bundle.js'
   },
   module: {

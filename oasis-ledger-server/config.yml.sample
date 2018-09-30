@@ -1,13 +1,13 @@
 logging:
   level: INFO
   loggers:
-    oasysledger: DEBUG
+    oasisledger: DEBUG
   appenders:
     - type: console
       target: stdout
     - type: file
-      currentLogFilename: ./log/oasys-ledger-server.log
-      archivedLogFilenamePattern: ./log/oasys-ledger-server.log.%d
+      currentLogFilename: ./log/oasis-ledger-server.log
+      archivedLogFilenamePattern: ./log/oasis-ledger-server.log.%d
       archivedFileCount: 100
 
 server:

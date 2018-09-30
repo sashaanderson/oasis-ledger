@@ -1,19 +1,19 @@
 {
-  "name": "oasys-ledger-ui",
+  "name": "oasis-ledger-ui",
   "version": "1.0.0",
   "description": "Personal finance management software",
   "main": "index.js",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sashaanderson/oasys-ledger.git"
+    "url": "git+https://github.com/sashaanderson/oasis-ledger.git"
   },
   "author": "Alexander Anderson",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sashaanderson/oasys-ledger/issues"
+    "url": "https://github.com/sashaanderson/oasis-ledger/issues"
   },
-  "homepage": "https://github.com/sashaanderson/oasys-ledger#readme",
+  "homepage": "https://github.com/sashaanderson/oasis-ledger#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
