@@ -15,6 +15,7 @@ public class App extends Application<AppConfig> {
 
     @Override
     public void run(AppConfig config, Environment env) throws IOException {
+        env.healthChecks().register("health", new AppHealth());
     }
 
     @Override
