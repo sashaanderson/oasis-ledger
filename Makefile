@@ -7,6 +7,7 @@ build-ui: oasis-ledger-ui/node_modules
 
 oasis-ledger-ui/node_modules: oasis-ledger-ui/package.json
 	cd oasis-ledger-ui && npm install
+	touch $@/
 
 .PHONY: build-server
 build-server:
