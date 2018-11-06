@@ -39,18 +39,27 @@ def main():
         if o in ("-d", "--directory"):
             basedir = a
     filepath = os.path.join(basedir, "oasys-ledger-core.db")
-    #if os.path.exists(filepath):
-        #.
-    #oasys-ledger-core-1.0+20181103T1142.db
+    if os.path.exists(filepath):
+        raise FileExistsError(filepath + " already exists")
+    build(filepath)
+
+
+def build(filepath):
     print("Creating", filepath)
-    #TODO: if file already exists, copy backup
     schema = slurp("src/tables")
     con = sqlite3.connect(filepath)
     cur = con.cursor()
     cur.execute("pragma foreign_keys = on")
     for name, ddl in schema.items():
-        print("==>", name)
+        print("Table:", name, "...", end=" ")
         cur.executescript(ddl)
+        datafile = "src/data/" + name + ".sql"
+        if os.path.exists(datafile):
+            with open(datafile) as f:
+                sql = f.read()
+            cur.executescript(sql)
+        cur.execute("select count(*) from " + name)
+        print(cur.fetchone()[0])
     con.close()
 
 
