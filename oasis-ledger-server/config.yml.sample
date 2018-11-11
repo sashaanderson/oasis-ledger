@@ -1,3 +1,9 @@
+database:
+  driverClass: org.sqlite.JDBC
+  url: jdbc:sqlite:../oasis-ledger-db/build/oasys-ledger-core.db
+  properties:
+    open_mode: 2 # SQLITE_OPEN_READWRITE, do not create if not exists
+
 logging:
   level: INFO
   loggers:

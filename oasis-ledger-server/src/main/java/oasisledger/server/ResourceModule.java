@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ResourceModule extends AbstractModule {
 
-    private final List<Class<?>> resources;
+    private final List<Class<?>> resourceClasses;
 
     public ResourceModule() throws IOException {
         ClassPath cp = ClassPath.from(ClassLoader.getSystemClassLoader());
@@ -20,17 +20,16 @@ public class ResourceModule extends AbstractModule {
         cp.getTopLevelClassesRecursive(packageName).forEach(ci -> {
             resources.add(ci.load());
         });
-        this.resources = Collections.unmodifiableList(resources);
+        this.resourceClasses = Collections.unmodifiableList(resources);
     }
 
-    public List<Class<?>> getResources() {
-        return resources;
+    public List<Class<?>> getResourceClasses() {
+        return resourceClasses;
     }
 
     @Override
     protected void configure() {
         bind(ResourceModule.class).toInstance(this);
-        resources.forEach(c -> bind(c));
+        resourceClasses.forEach(c -> bind(c));
     }
-
 }
