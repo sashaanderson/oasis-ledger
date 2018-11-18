@@ -1,12 +1,15 @@
 #!/usr/bin/bash -e
 
 sync() {
-  f1=../oasis-ledger-server/src/main/resources/assets/bundle.js
-  f2=../oasis-ledger-server/target/classes/assets/bundle.js
+  d1=../oasis-ledger-server/src/main/resources/assets
+  d2=../oasis-ledger-server/target/classes/assets
   while true; do
-    if [[ -e $f1 && -e $f2 && $f1 -nt $f2 ]]; then
-      cp -vf $f1 $f2
-    fi
+    for f1 in $d1/*.*; do
+        f2=$d2/${f1##*/}
+        if [[ -f $f1 && -f $f2 && $f1 -nt $f2 ]]; then
+          cp -vf $f1 $f2
+        fi
+    done
     sleep 2
   done
 }
