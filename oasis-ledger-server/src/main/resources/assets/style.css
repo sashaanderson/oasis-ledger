@@ -1,3 +1,42 @@
 body {
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+}
+.oasisledger-root {
+  padding-top: 40px;
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+}
+.oasisledger-root > header {
+  margin-top: -40px;
+  height: 40px;
+  display: flex;
+}
+.oasisledger-logo {
+  width: 200px;
+  border-right: 1px solid #f8f8f8;
+  line-height: 40px;
+  text-align: center;
+}
+.oasisledger-content {
+  min-height: 100%;
+  position: relative;
+}
+
+.oasisledger-sidebar {
+  border-right: 1px solid #f8f8f8;
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 200px;
+  z-index: 1;
+}
+.oasisledger-main {
+  border-top: 1px solid #f8f8f8;
+  left: 200px;
+  margin-left: -200px;
   overflow-y: scroll;
+  padding-left: 200px;
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 100%;
 }
