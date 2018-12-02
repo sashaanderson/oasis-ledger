@@ -16,6 +16,7 @@ dist: build
 	cp -uv oasis-ledger-server/target/oasis-ledger-server-*.jar dist/
 	cp -ruv oasis-ledger-server/target/lib/ dist/
 	cp -uv oasis-ledger-server/config.yml.sample dist/
+	cp -uv oasis-ledger-server/oasis-ledger-server.sh dist/
 	mkdir -pv dist/log
 
 .PHONY: distclean
