@@ -1,4 +1,9 @@
 import React from 'react';
+import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
+
+import Dashboard from './Dashboard';
+import Settings from './Settings';
+import Sidebar from './Sidebar';
 
 const App = () => (
   <div className="oasisledger-root">
@@ -7,16 +12,18 @@ const App = () => (
         Oasys Ledger
       </div>
     </header>
-    <div className="oasisledger-content">
-      <aside className="oasisledger-sidebar">
-        <nav className="oasisledger-quickmenu">
-          zzz
-        </nav>
-      </aside>
-      <main className="oasisledger-main">
-        zzz
-      </main>
-    </div>
+    <HashRouter>
+      <div className="oasisledger-content">
+        <Route path="/" component={Sidebar}/>
+        <main className="oasisledger-main">
+          <Switch>
+            <Redirect exact from="/" to="/dashboard"/>
+            <Route path="/dashboard" component={Dashboard}/>
+          </Switch>
+          <Route path="/settings" component={Settings}/>
+        </main>
+      </div>
+    </HashRouter>
   </div>
 );
 
