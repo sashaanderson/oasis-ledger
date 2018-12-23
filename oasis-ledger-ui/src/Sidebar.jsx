@@ -29,7 +29,7 @@ class Sidebar extends React.Component {
         <a className={"nav-link" + (active ? " active" : "")}
            href="#"
            onClick={this.onClickTab.bind(this, tabIndex)}>
-          <SvgIcon href={"bytesize:" + iconName}/>
+          <SvgIcon href={"bytesize-symbols:" + iconName}/>
         </a>
       </li>
     );
