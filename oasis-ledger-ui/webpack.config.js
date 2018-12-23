@@ -8,9 +8,8 @@ module.exports = {
     path: path.resolve(__dirname, '../oasis-ledger-server/src/main/resources/assets/'),
     filename: 'bundle.js'
   },
-  optimization: {
-    minimize: false, // disable UglifyJsPlugin
-  },
+  optimization: { minimize: false }, // disable UglifyJsPlugin
+  performance: { hints: false }, // disable warning in asset size limit
   module: {
     rules: [
       {
@@ -26,6 +25,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    mainFiles: ['index.js', 'index.jsx']
   }
 };
