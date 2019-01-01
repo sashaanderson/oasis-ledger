@@ -13,6 +13,15 @@ body {
   font-family: 'Roboto', sans-serif;
   color: var(--oasisledger-color-text);
 }
+.i {
+  width: 21px;
+  height: 21px;
+}
+
+.alert {
+  overflow-wrap: break-word;
+}
+
 .oasisledger-root {
   padding-top: 55px;
   position: absolute;
@@ -51,8 +60,6 @@ body {
   justify-content: center;
 }
 .oasisledger-sidebar__menu .i {
-  width: 20px;
-  height: 20px;
   fill: none;
   stroke: var(--oasisledger-color-secondary-text);
   stroke-width: 8%;

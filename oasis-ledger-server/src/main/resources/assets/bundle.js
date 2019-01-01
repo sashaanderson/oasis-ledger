@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,7 +98,7 @@
 if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(15)();
+  module.exports = __webpack_require__(17)();
 }
 
 
@@ -110,7 +110,7 @@ if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else
 
 
 if (true) {
-  module.exports = __webpack_require__(10);
+  module.exports = __webpack_require__(12);
 } else {}
 
 
@@ -267,438 +267,6 @@ module.exports = warning;
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isarray = __webpack_require__(17)
-
-/**
- * Expose `pathToRegexp`.
- */
-module.exports = pathToRegexp
-module.exports.parse = parse
-module.exports.compile = compile
-module.exports.tokensToFunction = tokensToFunction
-module.exports.tokensToRegExp = tokensToRegExp
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
-  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
-  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
-  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
-].join('|'), 'g')
-
-/**
- * Parse a string for the raw tokens.
- *
- * @param  {string}  str
- * @param  {Object=} options
- * @return {!Array}
- */
-function parse (str, options) {
-  var tokens = []
-  var key = 0
-  var index = 0
-  var path = ''
-  var defaultDelimiter = options && options.delimiter || '/'
-  var res
-
-  while ((res = PATH_REGEXP.exec(str)) != null) {
-    var m = res[0]
-    var escaped = res[1]
-    var offset = res.index
-    path += str.slice(index, offset)
-    index = offset + m.length
-
-    // Ignore already escaped sequences.
-    if (escaped) {
-      path += escaped[1]
-      continue
-    }
-
-    var next = str[index]
-    var prefix = res[2]
-    var name = res[3]
-    var capture = res[4]
-    var group = res[5]
-    var modifier = res[6]
-    var asterisk = res[7]
-
-    // Push the current path onto the tokens.
-    if (path) {
-      tokens.push(path)
-      path = ''
-    }
-
-    var partial = prefix != null && next != null && next !== prefix
-    var repeat = modifier === '+' || modifier === '*'
-    var optional = modifier === '?' || modifier === '*'
-    var delimiter = res[2] || defaultDelimiter
-    var pattern = capture || group
-
-    tokens.push({
-      name: name || key++,
-      prefix: prefix || '',
-      delimiter: delimiter,
-      optional: optional,
-      repeat: repeat,
-      partial: partial,
-      asterisk: !!asterisk,
-      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
-    })
-  }
-
-  // Match any characters still remaining.
-  if (index < str.length) {
-    path += str.substr(index)
-  }
-
-  // If the path exists, push it onto the end.
-  if (path) {
-    tokens.push(path)
-  }
-
-  return tokens
-}
-
-/**
- * Compile a string to a template function for the path.
- *
- * @param  {string}             str
- * @param  {Object=}            options
- * @return {!function(Object=, Object=)}
- */
-function compile (str, options) {
-  return tokensToFunction(parse(str, options))
-}
-
-/**
- * Prettier encoding of URI path segments.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeURIComponentPretty (str) {
-  return encodeURI(str).replace(/[\/?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeAsterisk (str) {
-  return encodeURI(str).replace(/[?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Expose a method for transforming tokens into the path function.
- */
-function tokensToFunction (tokens) {
-  // Compile all the tokens into regexps.
-  var matches = new Array(tokens.length)
-
-  // Compile all the patterns before compilation.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
-    }
-  }
-
-  return function (obj, opts) {
-    var path = ''
-    var data = obj || {}
-    var options = opts || {}
-    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
-
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i]
-
-      if (typeof token === 'string') {
-        path += token
-
-        continue
-      }
-
-      var value = data[token.name]
-      var segment
-
-      if (value == null) {
-        if (token.optional) {
-          // Prepend partial segment prefixes.
-          if (token.partial) {
-            path += token.prefix
-          }
-
-          continue
-        } else {
-          throw new TypeError('Expected "' + token.name + '" to be defined')
-        }
-      }
-
-      if (isarray(value)) {
-        if (!token.repeat) {
-          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
-        }
-
-        if (value.length === 0) {
-          if (token.optional) {
-            continue
-          } else {
-            throw new TypeError('Expected "' + token.name + '" to not be empty')
-          }
-        }
-
-        for (var j = 0; j < value.length; j++) {
-          segment = encode(value[j])
-
-          if (!matches[i].test(segment)) {
-            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
-          }
-
-          path += (j === 0 ? token.prefix : token.delimiter) + segment
-        }
-
-        continue
-      }
-
-      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
-
-      if (!matches[i].test(segment)) {
-        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
-      }
-
-      path += token.prefix + segment
-    }
-
-    return path
-  }
-}
-
-/**
- * Escape a regular expression string.
- *
- * @param  {string} str
- * @return {string}
- */
-function escapeString (str) {
-  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
-}
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {string} group
- * @return {string}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1')
-}
-
-/**
- * Attach the keys as a property of the regexp.
- *
- * @param  {!RegExp} re
- * @param  {Array}   keys
- * @return {!RegExp}
- */
-function attachKeys (re, keys) {
-  re.keys = keys
-  return re
-}
-
-/**
- * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {string}
- */
-function flags (options) {
-  return options.sensitive ? '' : 'i'
-}
-
-/**
- * Pull out keys from a regexp.
- *
- * @param  {!RegExp} path
- * @param  {!Array}  keys
- * @return {!RegExp}
- */
-function regexpToRegexp (path, keys) {
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g)
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name: i,
-        prefix: null,
-        delimiter: null,
-        optional: false,
-        repeat: false,
-        partial: false,
-        asterisk: false,
-        pattern: null
-      })
-    }
-  }
-
-  return attachKeys(path, keys)
-}
-
-/**
- * Transform an array into a regexp.
- *
- * @param  {!Array}  path
- * @param  {Array}   keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function arrayToRegexp (path, keys, options) {
-  var parts = []
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options).source)
-  }
-
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options))
-
-  return attachKeys(regexp, keys)
-}
-
-/**
- * Create a path regexp from string input.
- *
- * @param  {string}  path
- * @param  {!Array}  keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function stringToRegexp (path, keys, options) {
-  return tokensToRegExp(parse(path, options), keys, options)
-}
-
-/**
- * Expose a function for taking tokens and returning a RegExp.
- *
- * @param  {!Array}          tokens
- * @param  {(Array|Object)=} keys
- * @param  {Object=}         options
- * @return {!RegExp}
- */
-function tokensToRegExp (tokens, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options)
-    keys = []
-  }
-
-  options = options || {}
-
-  var strict = options.strict
-  var end = options.end !== false
-  var route = ''
-
-  // Iterate over the tokens and create our regexp string.
-  for (var i = 0; i < tokens.length; i++) {
-    var token = tokens[i]
-
-    if (typeof token === 'string') {
-      route += escapeString(token)
-    } else {
-      var prefix = escapeString(token.prefix)
-      var capture = '(?:' + token.pattern + ')'
-
-      keys.push(token)
-
-      if (token.repeat) {
-        capture += '(?:' + prefix + capture + ')*'
-      }
-
-      if (token.optional) {
-        if (!token.partial) {
-          capture = '(?:' + prefix + '(' + capture + '))?'
-        } else {
-          capture = prefix + '(' + capture + ')?'
-        }
-      } else {
-        capture = prefix + '(' + capture + ')'
-      }
-
-      route += capture
-    }
-  }
-
-  var delimiter = escapeString(options.delimiter || '/')
-  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?'
-  }
-
-  if (end) {
-    route += '$'
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)'
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys)
-}
-
-/**
- * Normalize the given path string, returning a regular expression.
- *
- * An empty array can be passed in for the keys, which will hold the
- * placeholder key descriptions. For example, using `/user/:id`, `keys` will
- * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(string|RegExp|Array)} path
- * @param  {(Array|Object)=}       keys
- * @param  {Object=}               options
- * @return {!RegExp}
- */
-function pathToRegexp (path, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options)
-    keys = []
-  }
-
-  options = options || {}
-
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, /** @type {!Array} */ (keys))
-  }
-
-  if (isarray(path)) {
-    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
-  }
-
-  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
-}
-
-
-/***/ }),
-/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2237,7 +1805,7 @@ MemoryRouter_MemoryRouter.propTypes = {
 
 /* harmony default export */ var react_router_dom_es_MemoryRouter = (es_MemoryRouter);
 // EXTERNAL MODULE: ./node_modules/path-to-regexp/index.js
-var path_to_regexp = __webpack_require__(5);
+var path_to_regexp = __webpack_require__(6);
 var path_to_regexp_default = /*#__PURE__*/__webpack_require__.n(path_to_regexp);
 
 // CONCATENATED MODULE: ./node_modules/react-router/es/matchPath.js
@@ -3025,7 +2593,7 @@ Switch_Switch.propTypes = {
 
 /* harmony default export */ var react_router_dom_es_matchPath = (es_matchPath);
 // EXTERNAL MODULE: ./node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js
-var hoist_non_react_statics_cjs = __webpack_require__(8);
+var hoist_non_react_statics_cjs = __webpack_require__(10);
 var hoist_non_react_statics_cjs_default = /*#__PURE__*/__webpack_require__.n(hoist_non_react_statics_cjs);
 
 // CONCATENATED MODULE: ./node_modules/react-router/es/withRouter.js
@@ -3112,6 +2680,438 @@ var withRouter_withRouter = function withRouter(Component) {
 
 
 
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isarray = __webpack_require__(19)
+
+/**
+ * Expose `pathToRegexp`.
+ */
+module.exports = pathToRegexp
+module.exports.parse = parse
+module.exports.compile = compile
+module.exports.tokensToFunction = tokensToFunction
+module.exports.tokensToRegExp = tokensToRegExp
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
+  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
+  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
+  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
+].join('|'), 'g')
+
+/**
+ * Parse a string for the raw tokens.
+ *
+ * @param  {string}  str
+ * @param  {Object=} options
+ * @return {!Array}
+ */
+function parse (str, options) {
+  var tokens = []
+  var key = 0
+  var index = 0
+  var path = ''
+  var defaultDelimiter = options && options.delimiter || '/'
+  var res
+
+  while ((res = PATH_REGEXP.exec(str)) != null) {
+    var m = res[0]
+    var escaped = res[1]
+    var offset = res.index
+    path += str.slice(index, offset)
+    index = offset + m.length
+
+    // Ignore already escaped sequences.
+    if (escaped) {
+      path += escaped[1]
+      continue
+    }
+
+    var next = str[index]
+    var prefix = res[2]
+    var name = res[3]
+    var capture = res[4]
+    var group = res[5]
+    var modifier = res[6]
+    var asterisk = res[7]
+
+    // Push the current path onto the tokens.
+    if (path) {
+      tokens.push(path)
+      path = ''
+    }
+
+    var partial = prefix != null && next != null && next !== prefix
+    var repeat = modifier === '+' || modifier === '*'
+    var optional = modifier === '?' || modifier === '*'
+    var delimiter = res[2] || defaultDelimiter
+    var pattern = capture || group
+
+    tokens.push({
+      name: name || key++,
+      prefix: prefix || '',
+      delimiter: delimiter,
+      optional: optional,
+      repeat: repeat,
+      partial: partial,
+      asterisk: !!asterisk,
+      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
+    })
+  }
+
+  // Match any characters still remaining.
+  if (index < str.length) {
+    path += str.substr(index)
+  }
+
+  // If the path exists, push it onto the end.
+  if (path) {
+    tokens.push(path)
+  }
+
+  return tokens
+}
+
+/**
+ * Compile a string to a template function for the path.
+ *
+ * @param  {string}             str
+ * @param  {Object=}            options
+ * @return {!function(Object=, Object=)}
+ */
+function compile (str, options) {
+  return tokensToFunction(parse(str, options))
+}
+
+/**
+ * Prettier encoding of URI path segments.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeURIComponentPretty (str) {
+  return encodeURI(str).replace(/[\/?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
+ *
+ * @param  {string}
+ * @return {string}
+ */
+function encodeAsterisk (str) {
+  return encodeURI(str).replace(/[?#]/g, function (c) {
+    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+  })
+}
+
+/**
+ * Expose a method for transforming tokens into the path function.
+ */
+function tokensToFunction (tokens) {
+  // Compile all the tokens into regexps.
+  var matches = new Array(tokens.length)
+
+  // Compile all the patterns before compilation.
+  for (var i = 0; i < tokens.length; i++) {
+    if (typeof tokens[i] === 'object') {
+      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
+    }
+  }
+
+  return function (obj, opts) {
+    var path = ''
+    var data = obj || {}
+    var options = opts || {}
+    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
+
+    for (var i = 0; i < tokens.length; i++) {
+      var token = tokens[i]
+
+      if (typeof token === 'string') {
+        path += token
+
+        continue
+      }
+
+      var value = data[token.name]
+      var segment
+
+      if (value == null) {
+        if (token.optional) {
+          // Prepend partial segment prefixes.
+          if (token.partial) {
+            path += token.prefix
+          }
+
+          continue
+        } else {
+          throw new TypeError('Expected "' + token.name + '" to be defined')
+        }
+      }
+
+      if (isarray(value)) {
+        if (!token.repeat) {
+          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
+        }
+
+        if (value.length === 0) {
+          if (token.optional) {
+            continue
+          } else {
+            throw new TypeError('Expected "' + token.name + '" to not be empty')
+          }
+        }
+
+        for (var j = 0; j < value.length; j++) {
+          segment = encode(value[j])
+
+          if (!matches[i].test(segment)) {
+            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
+          }
+
+          path += (j === 0 ? token.prefix : token.delimiter) + segment
+        }
+
+        continue
+      }
+
+      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
+
+      if (!matches[i].test(segment)) {
+        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+      }
+
+      path += token.prefix + segment
+    }
+
+    return path
+  }
+}
+
+/**
+ * Escape a regular expression string.
+ *
+ * @param  {string} str
+ * @return {string}
+ */
+function escapeString (str) {
+  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
+}
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {string} group
+ * @return {string}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1')
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {!RegExp} re
+ * @param  {Array}   keys
+ * @return {!RegExp}
+ */
+function attachKeys (re, keys) {
+  re.keys = keys
+  return re
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {string}
+ */
+function flags (options) {
+  return options.sensitive ? '' : 'i'
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {!RegExp} path
+ * @param  {!Array}  keys
+ * @return {!RegExp}
+ */
+function regexpToRegexp (path, keys) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g)
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name: i,
+        prefix: null,
+        delimiter: null,
+        optional: false,
+        repeat: false,
+        partial: false,
+        asterisk: false,
+        pattern: null
+      })
+    }
+  }
+
+  return attachKeys(path, keys)
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {!Array}  path
+ * @param  {Array}   keys
+ * @param  {!Object} options
+ * @return {!RegExp}
+ */
+function arrayToRegexp (path, keys, options) {
+  var parts = []
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options).source)
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options))
+
+  return attachKeys(regexp, keys)
+}
+
+/**
+ * Create a path regexp from string input.
+ *
+ * @param  {string}  path
+ * @param  {!Array}  keys
+ * @param  {!Object} options
+ * @return {!RegExp}
+ */
+function stringToRegexp (path, keys, options) {
+  return tokensToRegExp(parse(path, options), keys, options)
+}
+
+/**
+ * Expose a function for taking tokens and returning a RegExp.
+ *
+ * @param  {!Array}          tokens
+ * @param  {(Array|Object)=} keys
+ * @param  {Object=}         options
+ * @return {!RegExp}
+ */
+function tokensToRegExp (tokens, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
+  options = options || {}
+
+  var strict = options.strict
+  var end = options.end !== false
+  var route = ''
+
+  // Iterate over the tokens and create our regexp string.
+  for (var i = 0; i < tokens.length; i++) {
+    var token = tokens[i]
+
+    if (typeof token === 'string') {
+      route += escapeString(token)
+    } else {
+      var prefix = escapeString(token.prefix)
+      var capture = '(?:' + token.pattern + ')'
+
+      keys.push(token)
+
+      if (token.repeat) {
+        capture += '(?:' + prefix + capture + ')*'
+      }
+
+      if (token.optional) {
+        if (!token.partial) {
+          capture = '(?:' + prefix + '(' + capture + '))?'
+        } else {
+          capture = prefix + '(' + capture + ')?'
+        }
+      } else {
+        capture = prefix + '(' + capture + ')'
+      }
+
+      route += capture
+    }
+  }
+
+  var delimiter = escapeString(options.delimiter || '/')
+  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?'
+  }
+
+  if (end) {
+    route += '$'
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)'
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys)
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(string|RegExp|Array)} path
+ * @param  {(Array|Object)=}       keys
+ * @param  {Object=}               options
+ * @return {!RegExp}
+ */
+function pathToRegexp (path, keys, options) {
+  if (!isarray(keys)) {
+    options = /** @type {!Object} */ (keys || options)
+    keys = []
+  }
+
+  options = options || {}
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, /** @type {!Array} */ (keys))
+  }
+
+  if (isarray(path)) {
+    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
+  }
+
+  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
+}
 
 
 /***/ }),
@@ -3218,6 +3218,99 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(0);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DocumentTitle = function (_React$Component) {
+  _inherits(DocumentTitle, _React$Component);
+
+  function DocumentTitle() {
+    _classCallCheck(this, DocumentTitle);
+
+    return _possibleConstructorReturn(this, (DocumentTitle.__proto__ || Object.getPrototypeOf(DocumentTitle)).apply(this, arguments));
+  }
+
+  _createClass(DocumentTitle, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      document.title = "Oasys Ledger - " + this.props.title;
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      document.title = "Oasys Ledger";
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.Children.only(this.props.children);
+    }
+  }]);
+
+  return DocumentTitle;
+}(_react2.default.Component);
+
+DocumentTitle.propTypes = {
+  title: _propTypes2.default.string.isRequired,
+  children: _propTypes2.default.element.isRequired
+};
+
+exports.default = DocumentTitle;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SvgIcon = function SvgIcon(_ref) {
+  var href = _ref.href;
+  return _react2.default.createElement(
+    "svg",
+    { className: "i" },
+    _react2.default.createElement("use", { href: href.replace("bytesize-inline:", "lib/bytesize-icons-1.3/bytesize-inline.svg#").replace("bytesize-symbols:", "lib/bytesize-icons-1.3/bytesize-symbols.min.svg#") })
+  );
+};
+
+exports.default = SvgIcon;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 /**
  * Copyright 2015, Yahoo! Inc.
  * Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
@@ -3287,7 +3380,7 @@ module.exports = hoistNonReactStatics;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3297,13 +3390,13 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(11);
+var _reactDom = __webpack_require__(13);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactRouterDom = __webpack_require__(6);
+var _reactRouterDom = __webpack_require__(5);
 
-var _App = __webpack_require__(18);
+var _App = __webpack_require__(20);
 
 var _App2 = _interopRequireDefault(_App);
 
@@ -3316,7 +3409,7 @@ _reactDom2.default.render(_react2.default.createElement(
 ), document.getElementById('app'));
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3347,7 +3440,7 @@ assign:m}},Y={default:X},Z=Y&&X||Y;module.exports=Z.default||Z;
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3376,12 +3469,12 @@ if (true) {
   // DCE check should happen before ReactDOM bundle executes so that
   // DevTools can report bad minification during injection.
   checkDCE();
-  module.exports = __webpack_require__(12);
+  module.exports = __webpack_require__(14);
 } else {}
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3397,7 +3490,7 @@ if (true) {
 /*
  Modernizr 3.0.0pre (Custom Build) | MIT
 */
-var aa=__webpack_require__(1),n=__webpack_require__(7),ba=__webpack_require__(13);function ca(a,b,c,d,e,f,g,h){if(!a){a=void 0;if(void 0===b)a=Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var k=[c,d,e,f,g,h],l=0;a=Error(b.replace(/%s/g,function(){return k[l++]}));a.name="Invariant Violation"}a.framesToPop=1;throw a;}}
+var aa=__webpack_require__(1),n=__webpack_require__(7),ba=__webpack_require__(15);function ca(a,b,c,d,e,f,g,h){if(!a){a=void 0;if(void 0===b)a=Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var k=[c,d,e,f,g,h],l=0;a=Error(b.replace(/%s/g,function(){return k[l++]}));a.name="Invariant Violation"}a.framesToPop=1;throw a;}}
 function t(a){for(var b=arguments.length-1,c="https://reactjs.org/docs/error-decoder.html?invariant="+a,d=0;d<b;d++)c+="&args[]="+encodeURIComponent(arguments[d+1]);ca(!1,"Minified React error #"+a+"; visit %s for the full message or use the non-minified dev environment for full errors and additional helpful warnings. ",c)}aa?void 0:t("227");function da(a,b,c,d,e,f,g,h,k){var l=Array.prototype.slice.call(arguments,3);try{b.apply(c,l)}catch(m){this.onError(m)}}
 var ea=!1,fa=null,ha=!1,ia=null,ja={onError:function(a){ea=!0;fa=a}};function ka(a,b,c,d,e,f,g,h,k){ea=!1;fa=null;da.apply(ja,arguments)}function la(a,b,c,d,e,f,g,h,k){ka.apply(this,arguments);if(ea){if(ea){var l=fa;ea=!1;fa=null}else t("198"),l=void 0;ha||(ha=!0,ia=l)}}var ma=null,na={};
 function oa(){if(ma)for(var a in na){var b=na[a],c=ma.indexOf(a);-1<c?void 0:t("96",a);if(!pa[c]){b.extractEvents?void 0:t("97",a);pa[c]=b;c=b.eventTypes;for(var d in c){var e=void 0;var f=c[d],g=b,h=d;qa.hasOwnProperty(h)?t("99",h):void 0;qa[h]=f;var k=f.phasedRegistrationNames;if(k){for(e in k)k.hasOwnProperty(e)&&ra(k[e],g,h);e=!0}else f.registrationName?(ra(f.registrationName,g,h),e=!0):e=!1;e?void 0:t("98",d,a)}}}}
@@ -3623,19 +3716,19 @@ var Nh={default:Mh},Oh=Nh&&Mh||Nh;module.exports=Oh.default||Oh;
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 if (true) {
-  module.exports = __webpack_require__(14);
+  module.exports = __webpack_require__(16);
 } else {}
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3658,7 +3751,7 @@ exports.unstable_cancelScheduledWork=function(a){var b=a.next;if(null!==b){if(b=
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3671,7 +3764,7 @@ exports.unstable_cancelScheduledWork=function(a){var b=a.next;if(null!==b){if(b=
 
 
 
-var ReactPropTypesSecret = __webpack_require__(16);
+var ReactPropTypesSecret = __webpack_require__(18);
 
 function emptyFunction() {}
 
@@ -3724,7 +3817,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3743,7 +3836,7 @@ module.exports = ReactPropTypesSecret;
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = Array.isArray || function (arr) {
@@ -3752,7 +3845,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3766,17 +3859,17 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(6);
+var _reactRouterDom = __webpack_require__(5);
 
-var _Dashboard = __webpack_require__(19);
+var _Dashboard = __webpack_require__(21);
 
 var _Dashboard2 = _interopRequireDefault(_Dashboard);
 
-var _Settings = __webpack_require__(20);
+var _Settings = __webpack_require__(22);
 
 var _Settings2 = _interopRequireDefault(_Settings);
 
-var _Sidebar = __webpack_require__(21);
+var _Sidebar = __webpack_require__(28);
 
 var _Sidebar2 = _interopRequireDefault(_Sidebar);
 
@@ -3821,7 +3914,7 @@ var App = function App() {
 exports.default = App;
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3848,7 +3941,7 @@ var Dashboard = function Dashboard() {
 exports.default = Dashboard;
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3862,20 +3955,599 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactRouterDom = __webpack_require__(5);
+
+var _Accounts = __webpack_require__(23);
+
+var _Accounts2 = _interopRequireDefault(_Accounts);
+
+var _Users = __webpack_require__(27);
+
+var _Users2 = _interopRequireDefault(_Users);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Settings = function Settings() {
   return _react2.default.createElement(
-    'p',
+    'div',
     null,
-    'Settings'
+    _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/settings', component: SettingsIndex }),
+    _react2.default.createElement(_reactRouterDom.Route, { path: '/settings/accounts', component: _Accounts2.default }),
+    _react2.default.createElement(_reactRouterDom.Route, { path: '/settings/users', component: _Users2.default })
+  );
+};
+
+var SettingsIndex = function SettingsIndex() {
+  return _react2.default.createElement(
+    'div',
+    { className: 'm-3' },
+    _react2.default.createElement(
+      'ul',
+      { className: 'nav flex-column' },
+      _react2.default.createElement(
+        'li',
+        { className: 'nav-item' },
+        _react2.default.createElement(
+          _reactRouterDom.Link,
+          { to: '/settings/accounts', className: 'nav-link' },
+          'Accounts'
+        )
+      ),
+      _react2.default.createElement(
+        'li',
+        { className: 'nav-item' },
+        _react2.default.createElement(
+          _reactRouterDom.Link,
+          { to: '/settings/users', className: 'nav-link' },
+          'Users'
+        )
+      )
+    )
   );
 };
 
 exports.default = Settings;
 
 /***/ }),
-/* 21 */
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _AccountSelect = __webpack_require__(24);
+
+var _AccountSelect2 = _interopRequireDefault(_AccountSelect);
+
+var _AccountTypeSelect = __webpack_require__(25);
+
+var _AccountTypeSelect2 = _interopRequireDefault(_AccountTypeSelect);
+
+var _DocumentTitle = __webpack_require__(8);
+
+var _DocumentTitle2 = _interopRequireDefault(_DocumentTitle);
+
+var _FetchContainer = __webpack_require__(26);
+
+var _FetchContainer2 = _interopRequireDefault(_FetchContainer);
+
+var _SvgIcon = __webpack_require__(9);
+
+var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
+
+var _unicode = __webpack_require__(29);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Accounts = function Accounts() {
+  return _react2.default.createElement(
+    'div',
+    { className: 'm-3' },
+    _react2.default.createElement(
+      _FetchContainer2.default,
+      { fetch: {
+          accounts: (0, _FetchContainer.fetchJSON)("api/account"),
+          accountTypes: (0, _FetchContainer.fetchJSON)("api/account-type")
+        } },
+      _react2.default.createElement(AccountsMain, null)
+    )
+  );
+};
+
+var AccountsMain = function (_React$Component) {
+  _inherits(AccountsMain, _React$Component);
+
+  function AccountsMain(props) {
+    _classCallCheck(this, AccountsMain);
+
+    var _this = _possibleConstructorReturn(this, (AccountsMain.__proto__ || Object.getPrototypeOf(AccountsMain)).call(this, props));
+
+    _this.state = {
+      accounts: props.accounts.slice(0) // shallow copy
+    };
+    _this.accountCreateModalRef = _react2.default.createRef();
+    _this.handleClick = _this.handleClick.bind(_this);
+    _this.handleAccountCreated = _this.handleAccountCreated.bind(_this);
+    return _this;
+  }
+
+  _createClass(AccountsMain, [{
+    key: 'handleClick',
+    value: function handleClick() {
+      this.accountCreateModalRef.current.showModal();
+    }
+  }, {
+    key: 'handleAccountCreated',
+    value: function handleAccountCreated(account) {
+      this.setState(function (prevState) {
+        return {
+          accounts: prevState.accounts.concat([account]).sort(function (a1, a2) {
+            return a1.accountCode.localeCompare(a2.accountCode);
+          })
+        };
+      });
+    }
+  }, {
+    key: 'renderListGroup',
+    value: function renderListGroup(accountType) {
+      var _this2 = this;
+
+      var accounts = this.state.accounts.filter(function (account) {
+        return account.accountTypeId === accountType.accountTypeId;
+      });
+      return _react2.default.createElement(
+        'div',
+        { className: 'card mb-4', key: accountType.accountTypeId },
+        _react2.default.createElement(
+          'div',
+          { className: 'card-header' },
+          _react2.default.createElement(
+            'div',
+            { className: 'd-flex w-100 justify-content-between' },
+            _react2.default.createElement(
+              'div',
+              null,
+              accountType.accountTypeCode + " - " + accountType.accountTypeName
+            ),
+            _react2.default.createElement(
+              'div',
+              null,
+              _react2.default.createElement(
+                'small',
+                null,
+                accounts.length,
+                ' account',
+                accounts.length == 1 ? "" : "s"
+              )
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'ul',
+          { className: 'list-group list-group-flush' },
+          accounts.filter(function (account) {
+            return !account.parentAccountId;
+          }).map(function (account) {
+            return _this2.renderListGroupItem(account);
+          })
+        )
+      );
+    }
+  }, {
+    key: 'renderListGroupItem',
+    value: function renderListGroupItem(account) {
+      var _this3 = this;
+
+      var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+      return _react2.default.createElement(
+        _react2.default.Fragment,
+        { key: account.accountId },
+        _react2.default.createElement(
+          'li',
+          { className: 'list-group-item py-2', key: account.accountId },
+          _react2.default.createElement(
+            'span',
+            { style: { paddingLeft: depth + "em" } },
+            account.accountCode + " - " + account.accountName
+          )
+        ),
+        this.state.accounts.filter(function (a2) {
+          return a2.parentAccountId == account.accountId;
+        }).map(function (a2) {
+          return _this3.renderListGroupItem(a2, depth + 1);
+        })
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this4 = this;
+
+      return _react2.default.createElement(
+        _DocumentTitle2.default,
+        { title: 'Accounts' },
+        _react2.default.createElement(
+          'div',
+          { className: 'container-fluid' },
+          _react2.default.createElement(
+            'p',
+            null,
+            _react2.default.createElement(
+              'button',
+              { type: 'button', className: 'btn btn-primary', onClick: this.handleClick },
+              _react2.default.createElement(_SvgIcon2.default, { href: 'bytesize-inline:i-plus' }),
+              ' Create Account'
+            ),
+            _react2.default.createElement(AccountCreateModal, {
+              accountTypes: this.props.accountTypes,
+              accounts: this.state.accounts,
+              handleAccountCreated: this.handleAccountCreated,
+              ref: this.accountCreateModalRef
+            })
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'row' },
+            _react2.default.createElement(
+              'div',
+              { className: 'col-12 col-lg-6' },
+              this.props.accountTypes.filter(function (accountType) {
+                return accountType.accountTypeId <= 3;
+              }) // Asset, Liability, Equity
+              .map(function (accountType) {
+                return _this4.renderListGroup(accountType);
+              })
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'col-12 col-lg-6' },
+              this.props.accountTypes.filter(function (accountType) {
+                return accountType.accountTypeId > 3;
+              }) // Income, Expense
+              .map(function (accountType) {
+                return _this4.renderListGroup(accountType);
+              })
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return AccountsMain;
+}(_react2.default.Component);
+
+var AccountCreateModal = function (_React$Component2) {
+  _inherits(AccountCreateModal, _React$Component2);
+
+  function AccountCreateModal(props) {
+    _classCallCheck(this, AccountCreateModal);
+
+    var _this5 = _possibleConstructorReturn(this, (AccountCreateModal.__proto__ || Object.getPrototypeOf(AccountCreateModal)).call(this, props));
+
+    _this5.state = {
+      disabled: false,
+      err: null, message: null,
+      input: {
+        accountType: "",
+        accountCode: "",
+        accountName: "",
+        parentAccount: ""
+      },
+      valid: {}
+    };
+
+    _this5.modalRef = _react2.default.createRef();
+
+    _this5.showModal = _this5.showModal.bind(_this5);
+    _this5.handleChange = _this5.handleChange.bind(_this5);
+    _this5.handleClear = _this5.handleClear.bind(_this5);
+    _this5.handleSubmit = _this5.handleSubmit.bind(_this5);
+    return _this5;
+  }
+
+  _createClass(AccountCreateModal, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      $(this.modalRef.current).on('hidden.bs.modal', function (e) {});
+    }
+  }, {
+    key: 'showModal',
+    value: function showModal() {
+      this.handleClear();
+      $(this.modalRef.current).modal();
+    }
+  }, {
+    key: 'setInput',
+    value: function setInput(id, value) {
+      this.setState(function (prevState) {
+        var input = Object.assign({}, prevState.input);
+        input[id] = value;
+        if (id == "accountType" && prevState.input[id] != value) {
+          input["parentAccount"] = "";
+        }
+        return {
+          input: input,
+          valid: {}
+        };
+      });
+    }
+  }, {
+    key: 'handleChange',
+    value: function handleChange(e) {
+      var id = e.target.id.replace(/Input$/, '');
+      this.setInput(id, e.target.value);
+    }
+  }, {
+    key: 'handleClear',
+    value: function handleClear() {
+      this.setState({
+        err: null, message: null,
+        input: Object.keys(this.state.input).reduce(function (input, key) {
+          input[key] = "";
+          return input;
+        }, {}),
+        valid: {}
+      });
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(e) {
+      var _this6 = this;
+
+      e.preventDefault();
+
+      var input = this.state.input;
+      var valid = this.state.valid;
+      valid.accountType = !!input.accountType;
+      valid.accountCode = !!input.accountCode;
+      valid.accountName = !!input.accountName;
+      valid.parentAccount = true;
+      if (!Object.keys(valid).every(function (id) {
+        return valid[id];
+      })) {
+        this.setState({ valid: valid });
+        return;
+      }
+
+      this.setState({ disabled: true, err: null, message: null });
+
+      var accountDTO = {
+        accountTypeId: input.accountType,
+        accountCode: input.accountCode,
+        accountName: input.accountName,
+        parentAccountId: input.parentAccount
+      };
+      (0, _FetchContainer.fetchJSON)('api/account', {
+        method: 'post',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(accountDTO)
+      }).then(function (account) {
+        _this6.setState({
+          disabled: false,
+          message: account.accountCode + " " + _unicode.mdash + " account has been created."
+        });
+        _this6.props.handleAccountCreated(account);
+      }).catch(function (err) {
+        _this6.setState({
+          disabled: false,
+          err: err
+        });
+      });
+    }
+  }, {
+    key: 'getFormControlProps',
+    value: function getFormControlProps(id) {
+      var className = 'form-control';
+      if (this.state.valid.hasOwnProperty(id)) {
+        if (this.state.valid[id]) {
+          className += " is-valid";
+        } else {
+          className += " is-invalid";
+        }
+      }
+      return {
+        className: className,
+        id: id + "Input",
+        value: this.state.input[id],
+        onChange: this.handleChange
+      };
+    }
+  }, {
+    key: 'renderAlert',
+    value: function renderAlert() {
+      var _this7 = this;
+
+      var handleClear = function handleClear() {
+        return _this7.setState({ err: null, message: null });
+      };
+      if (this.state.err || this.state.message) {
+        return _react2.default.createElement(
+          'div',
+          { className: "alert alert-" + (this.state.err ? "danger" : "success") + " alert-dismissible mb-0" },
+          _react2.default.createElement(
+            'button',
+            { type: 'button', className: 'close', 'aria-label': 'Close', onClick: handleClear },
+            _react2.default.createElement(
+              'span',
+              { 'aria-hidden': 'true' },
+              '\xD7'
+            )
+          ),
+          this.state.err ? this.state.err.toString() : this.state.message
+        );
+      }
+      return null;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this8 = this;
+
+      return _react2.default.createElement(
+        'form',
+        { onSubmit: this.handleSubmit },
+        _react2.default.createElement(
+          'div',
+          { ref: this.modalRef,
+            className: 'modal fade', tabindex: '-1', role: 'dialog', 'aria-hidden': 'true' },
+          _react2.default.createElement(
+            'div',
+            { className: 'modal-dialog modal-lg', role: 'document' },
+            _react2.default.createElement(
+              'div',
+              { className: 'modal-content' },
+              _react2.default.createElement(
+                'div',
+                { className: 'modal-header' },
+                _react2.default.createElement(
+                  'h5',
+                  { className: 'modal-title' },
+                  'Create Account'
+                ),
+                _react2.default.createElement(
+                  'button',
+                  { type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+                  _react2.default.createElement(
+                    'span',
+                    { 'aria-hidden': 'true' },
+                    '\xD7'
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'modal-body' },
+                _react2.default.createElement(
+                  'div',
+                  { className: 'form-row' },
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'form-group col-lg-4' },
+                    _react2.default.createElement(
+                      'label',
+                      { htmlFor: 'accountTypeInput' },
+                      'Account Type'
+                    ),
+                    _react2.default.createElement(
+                      _AccountTypeSelect2.default,
+                      { accountTypes: this.props.accountTypes },
+                      _react2.default.createElement('select', this.getFormControlProps('accountType'))
+                    )
+                  ),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'form-group col-lg-8' },
+                    _react2.default.createElement(
+                      'label',
+                      { htmlFor: 'parentAccountInput' },
+                      'Parent Account'
+                    ),
+                    _react2.default.createElement(
+                      _AccountSelect2.default,
+                      {
+                        accountTypes: this.props.accountTypes,
+                        accounts: this.props.accounts.filter(function (a) {
+                          return a.accountTypeId == _this8.state.input.accountType;
+                        }),
+                        activeOnly: true
+                      },
+                      _react2.default.createElement(
+                        'select',
+                        _extends({ disabled: !this.state.input.accountType }, this.getFormControlProps('parentAccount')),
+                        _react2.default.createElement(
+                          'option',
+                          { value: '' },
+                          'None'
+                        )
+                      )
+                    )
+                  )
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'form-group' },
+                  _react2.default.createElement(
+                    'label',
+                    { htmlFor: 'accountCodeInput' },
+                    'Short Code'
+                  ),
+                  _react2.default.createElement('input', _extends({
+                    type: 'text',
+                    placeholder: 'Short Code'
+                  }, this.getFormControlProps('accountCode')))
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'form-group' },
+                  _react2.default.createElement(
+                    'label',
+                    { htmlFor: 'accountNameInput' },
+                    'Long Name'
+                  ),
+                  _react2.default.createElement('input', _extends({
+                    type: 'text',
+                    placeholder: 'Long Name'
+                  }, this.getFormControlProps('accountName')))
+                ),
+                this.renderAlert()
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'modal-footer justify-content-start flex-wrap' },
+                _react2.default.createElement(
+                  'button',
+                  { type: 'button', className: 'btn my-1 btn-primary', disabled: this.state.disabled,
+                    onClick: this.handleSubmit },
+                  'Create Account'
+                ),
+                _react2.default.createElement(
+                  'button',
+                  { type: 'button', className: 'btn my-1 btn-outline-secondary',
+                    onClick: this.handleClear },
+                  'Clear'
+                ),
+                _react2.default.createElement(
+                  'button',
+                  { type: 'button', className: 'btn my-1 btn-outline-secondary', 'data-dismiss': 'modal' },
+                  'Close'
+                )
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return AccountCreateModal;
+}(_react2.default.Component);
+
+exports.default = Accounts;
+
+/***/ }),
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3891,9 +4563,381 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(6);
+var _propTypes = __webpack_require__(0);
 
-var _SvgIcon = __webpack_require__(22);
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _unicode = __webpack_require__(29);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var AccountSelect = function (_React$Component) {
+  _inherits(AccountSelect, _React$Component);
+
+  function AccountSelect(props) {
+    _classCallCheck(this, AccountSelect);
+
+    return _possibleConstructorReturn(this, (AccountSelect.__proto__ || Object.getPrototypeOf(AccountSelect)).call(this, props));
+  }
+
+  _createClass(AccountSelect, [{
+    key: 'renderOption',
+    value: function renderOption(account) {
+      var _this2 = this;
+
+      var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      return _react2.default.createElement(
+        _react2.default.Fragment,
+        { key: account.accountId },
+        _react2.default.createElement(
+          'option',
+          { value: account.accountId },
+          _unicode.emsp.repeat(depth),
+          account.accountCode + " - " + account.accountName
+        ),
+        this.props.accounts.filter(function (a2) {
+          return a2.parentAccountId == account.accountId;
+        }).map(function (a2) {
+          return _this2.renderOption(a2, depth + 1);
+        })
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      var selectComponent = _react2.default.Children.only(this.props.children); // <select>
+      var options = _react2.default.Children.toArray(selectComponent.props.children);
+      if (this.props.accountTypes && this.props.accounts) {
+        options.push(this.props.accountTypes.filter(function (accountType) {
+          return _this3.props.accounts.some(function (account) {
+            return account.accountTypeId === accountType.accountTypeId;
+          });
+        }).map(function (accountType) {
+          return _react2.default.createElement(
+            'optgroup',
+            {
+              key: accountType.accountTypeId,
+              label: accountType.accountTypeCode + " - " + accountType.accountTypeName
+            },
+            _this3.props.accounts.filter(function (account) {
+              return account.accountTypeId === accountType.accountTypeId;
+            }).filter(function (account) {
+              return !account.parentAccountId;
+            }).filter(function (account) {
+              return !_this3.props.activeOnly || account.activeFlag === "Y";
+            }).map(function (account) {
+              return _this3.renderOption(account);
+            })
+          );
+        }));
+      } else {
+        options.push(_react2.default.createElement('optgroup', { disabled: true, label: 'Loading...', className: 'text-muted' }));
+      }
+      return _react2.default.cloneElement.apply(_react2.default, [selectComponent, selectComponent.props].concat(_toConsumableArray(options)));
+    }
+  }]);
+
+  return AccountSelect;
+}(_react2.default.Component);
+
+AccountSelect.propTypes = {
+  accountTypes: _propTypes2.default.array,
+  accounts: _propTypes2.default.array,
+  activeOnly: _propTypes2.default.bool
+};
+
+exports.default = AccountSelect;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var AccountTypeSelect = function AccountTypeSelect(_ref) {
+  var accountTypes = _ref.accountTypes,
+      children = _ref.children;
+
+  var options = [_react2.default.createElement(
+    "option",
+    { value: "", hidden: true },
+    "Choose account type..."
+  )];
+  if (accountTypes) {
+    options.push(accountTypes.map(function (accountType) {
+      return _react2.default.createElement(
+        "option",
+        { value: accountType.accountTypeId },
+        accountType.accountTypeCode,
+        " - ",
+        accountType.accountTypeName
+      );
+    }));
+  } else {
+    options.push(_react2.default.createElement(
+      "option",
+      { disabled: true, className: "text-muted" },
+      "Loading..."
+    ));
+  }
+  var selectComponent = _react2.default.Children.only(children); // <select>
+  return _react2.default.cloneElement.apply(_react2.default, [selectComponent, selectComponent.props].concat(options));
+};
+
+exports.default = AccountTypeSelect;
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+exports.fetchCheck = fetchCheck;
+exports.fetchJSON = fetchJSON;
+exports.fetchText = fetchText;
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(0);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FetchContainer = function (_React$Component) {
+  _inherits(FetchContainer, _React$Component);
+
+  function FetchContainer(props) {
+    _classCallCheck(this, FetchContainer);
+
+    var _this = _possibleConstructorReturn(this, (FetchContainer.__proto__ || Object.getPrototypeOf(FetchContainer)).call(this, props));
+
+    _this.state = {
+      err: null,
+      fetchResults: null
+    };
+    return _this;
+  }
+
+  _createClass(FetchContainer, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.load();
+    }
+  }, {
+    key: 'load',
+    value: function load() {
+      var _this2 = this;
+
+      var fetchKeys = Object.keys(this.props.fetch);
+      Promise.all(fetchKeys.map(function (key) {
+        return Promise.resolve(_this2.props.fetch[key]);
+      })).then(function (values) {
+        var fetchResults = {};
+        fetchKeys.forEach(function (key, i) {
+          return fetchResults[key] = values[i];
+        });
+        _this2.setState({ fetchResults: fetchResults });
+      }).catch(function (err) {
+        _this2.setState({ err: err });
+      });
+    }
+  }, {
+    key: 'renderLoading',
+    value: function renderLoading() {
+      return null;
+    }
+  }, {
+    key: 'renderError',
+    value: function renderError(err) {
+      console.log("Oh sorrow! Error: %o", err);
+      return _react2.default.createElement(
+        'div',
+        { className: 'alert alert-danger' },
+        _react2.default.createElement(
+          'strong',
+          null,
+          'Oh sorrow!'
+        ),
+        ' ',
+        err.toString()
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      if (this.state.err) {
+        return this.renderError(this.state.err);
+      }
+      if (this.props.wait && !this.state.fetchResults) {
+        return this.renderLoading();
+      }
+      var onlyChild = _react2.default.Children.only(this.props.children);
+      return _react2.default.cloneElement(onlyChild, this.state.fetchResults);
+    }
+  }]);
+
+  return FetchContainer;
+}(_react2.default.Component);
+
+FetchContainer.propTypes = {
+  children: _propTypes2.default.element.isRequired,
+  fetch: _propTypes2.default.object.isRequired,
+  wait: _propTypes2.default.bool
+};
+
+FetchContainer.defaultProps = {
+  wait: true
+};
+
+function fetchCheck(res) {
+  if (res.ok) {
+    return res;
+  } else {
+    return res.text().then(function (text) {
+      throw new Error(text ? text : res.statusText);
+    }, function (err) {
+      throw new Error(res.statusText);
+    }).catch(function (err) {
+      console.error("Error in fetchCheck: %o", err);
+      throw err;
+    });
+  }
+}
+
+function fetchWithCheck(url, init) {
+  return fetch(url, Object.assign({ method: 'get' }, init)).then(fetchCheck);
+}
+
+function fetchJSON(url, init) {
+  return fetchWithCheck(url, init).then(function (res) {
+    return res.json();
+  });
+}
+
+function fetchText(url, init) {
+  return fetchWithCheck(url, init).then(function (res) {
+    return res.text();
+  });
+}
+
+exports.default = FetchContainer;
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _DocumentTitle = __webpack_require__(8);
+
+var _DocumentTitle2 = _interopRequireDefault(_DocumentTitle);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Users = function (_React$Component) {
+  _inherits(Users, _React$Component);
+
+  function Users() {
+    _classCallCheck(this, Users);
+
+    return _possibleConstructorReturn(this, (Users.__proto__ || Object.getPrototypeOf(Users)).apply(this, arguments));
+  }
+
+  _createClass(Users, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        _DocumentTitle2.default,
+        { title: 'Users' },
+        _react2.default.createElement(
+          'div',
+          null,
+          'Users'
+        )
+      );
+    }
+  }]);
+
+  return Users;
+}(_react2.default.Component);
+
+exports.default = Users;
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(5);
+
+var _SvgIcon = __webpack_require__(9);
 
 var _SvgIcon2 = _interopRequireDefault(_SvgIcon);
 
@@ -3942,7 +4986,7 @@ var Sidebar = function (_React$Component) {
           { className: "nav-link" + (active ? " active" : ""),
             href: '#',
             onClick: this.onClickTab.bind(this, tabIndex) },
-          _react2.default.createElement(_SvgIcon2.default, { href: "bytesize:" + iconName })
+          _react2.default.createElement(_SvgIcon2.default, { href: "bytesize-symbols:" + iconName })
         )
       );
     }
@@ -4038,7 +5082,7 @@ var Sidebar = function (_React$Component) {
 exports.default = Sidebar;
 
 /***/ }),
-/* 22 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4047,23 +5091,17 @@ exports.default = Sidebar;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+// Unicode names
+var EN_SPACE = exports.EN_SPACE = "\u2002";
+var EM_SPACE = exports.EM_SPACE = "\u2003";
+var EN_DASH = exports.EN_DASH = "\u2013";
+var EM_DASH = exports.EM_DASH = "\u2014";
 
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var SvgIcon = function SvgIcon(_ref) {
-  var href = _ref.href;
-  return _react2.default.createElement(
-    "svg",
-    { className: "i" },
-    _react2.default.createElement("use", { href: href.replace("bytesize:", "lib/bytesize-icons-1.3/bytesize-symbols.min.svg#") })
-  );
-};
-
-exports.default = SvgIcon;
+// HTML entity names
+var ensp = exports.ensp = EN_SPACE;
+var emsp = exports.emsp = EM_SPACE;
+var ndash = exports.ndash = EN_DASH;
+var mdash = exports.mdash = EM_DASH;
 
 /***/ })
 /******/ ]);
