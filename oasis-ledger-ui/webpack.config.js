@@ -25,6 +25,9 @@ module.exports = {
     ]
   },
   resolve: {
+    alias: {
+      util: path.resolve(__dirname, './src/util/'),
+    },
     extensions: ['.js', '.jsx'],
     mainFiles: ['index.js', 'index.jsx']
   }
