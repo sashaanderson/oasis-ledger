@@ -8,6 +8,8 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.jdbi.v3.core.Jdbi;
 
 import java.io.IOException;
@@ -16,6 +18,11 @@ public class App extends Application<AppConfig> {
 
     public static void main(final String[] args) throws Exception {
         new App().run(args);
+    }
+
+    @Override
+    public void initialize(final Bootstrap<AppConfig> bootstrap) {
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html", "assets"));
     }
 
     @Override
@@ -39,10 +46,10 @@ public class App extends Application<AppConfig> {
                 .forEach(c -> {
                     env.jersey().register(injector.getInstance(c));
                 });
-    }
 
-    @Override
-    public void initialize(final Bootstrap<AppConfig> bootstrap) {
-        bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html", "assets"));
+        env.jersey().register(RolesAllowedDynamicFeature.class);
+        env.jersey().property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
+
+        env.jersey().register(AppExceptionMapper.class);
     }
 }
