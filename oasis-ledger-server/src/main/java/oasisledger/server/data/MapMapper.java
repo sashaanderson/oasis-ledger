@@ -24,7 +24,7 @@ public class MapMapper implements RowMapper<Map<String, Object>> {
         int columnCount = md.getColumnCount();
 
         MapMapperContext mapperContext = this.mapperContext;
-        if (mapperContext == null) {
+        if (mapperContext == null || rs != mapperContext.rs) {
             mapperContext = new MapMapperContext();
             mapperContext.rs = rs;
             mapperContext.columnNames = new String[columnCount];
@@ -32,8 +32,8 @@ public class MapMapper implements RowMapper<Map<String, Object>> {
                 String s = md.getColumnName(i);
                 mapperContext.columnNames[i - 1] = convertSnakeCaseToCamelCase(s);
             }
+            this.mapperContext = mapperContext;
         }
-        this.mapperContext = mapperContext;
 
         Map<String, Object> row = new LinkedHashMap<>();
         for (int i = 1; i <= columnCount; i++) {
