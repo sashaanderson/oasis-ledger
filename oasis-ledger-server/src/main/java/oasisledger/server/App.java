@@ -1,6 +1,5 @@
 package oasisledger.server;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
@@ -8,11 +7,14 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.jdbi.v3.core.Jdbi;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class App extends Application<AppConfig> {
 
@@ -33,12 +35,7 @@ public class App extends Application<AppConfig> {
         Jdbi jdbi = jdbiFactory.build(env, config.getDataSourceFactory(), "db");
 
         Injector injector = Guice.createInjector(
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(Jdbi.class).toInstance(jdbi);
-                    }
-                },
+                new DbModule(jdbi),
                 new ResourceModule()
         );
         injector.getInstance(ResourceModule.class)
@@ -46,6 +43,12 @@ public class App extends Application<AppConfig> {
                 .forEach(c -> {
                     env.jersey().register(injector.getInstance(c));
                 });
+
+        env.jersey().register(new LoggingFeature(
+                Logger.getLogger(getClass().getName()),
+                Level.FINE, // DEBUG
+                LoggingFeature.Verbosity.PAYLOAD_ANY,
+                LoggingFeature.DEFAULT_MAX_ENTITY_SIZE));
 
         env.jersey().register(RolesAllowedDynamicFeature.class);
         env.jersey().property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);

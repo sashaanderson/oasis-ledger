@@ -8,10 +8,17 @@ logging:
   appenders:
     - type: console
       target: stdout
+      threshold: INFO
     - type: file
       currentLogFilename: ./log/oasis-ledger-server.log
       archivedLogFilenamePattern: ./log/oasis-ledger-server.log.%d
       archivedFileCount: 100
+      threshold: INFO
+    - type: file
+      currentLogFilename: ./log/oasis-ledger-server-debug.log
+      archivedLogFilenamePattern: ./log/oasis-ledger-server-debug.log.%d
+      archivedFileCount: 100
+      logFormat: "%date %level [%thread] %logger{32} [%file:%line] %msg%n"
 
 server:
   type: simple
