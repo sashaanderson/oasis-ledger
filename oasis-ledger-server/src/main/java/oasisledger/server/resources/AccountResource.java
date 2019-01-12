@@ -19,7 +19,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class AccountResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountResource.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Jdbi jdbi;
     private final SysSequenceResource sysSequenceResource;
@@ -38,13 +38,23 @@ public class AccountResource {
     @POST
     public AccountDTO create(
             @NotNull @Valid AccountDTO account) {
+        AccountDTO parentAccount = null;
+        if (account.getParentAccount() != null) {
+            parentAccount = jdbi.withExtension(AccountDAO.class, dao ->
+                dao.findByCode(account.getParentAccount())
+            );
+            if (account.getParentAccountId() == null)
+                account.setParentAccountId(parentAccount.getAccountId());
+            else if (account.getParentAccountId().intValue() != parentAccount.getAccountId())
+                throw new BadRequestException("Conflicting parentAccount and parentAccountId");
+        }
         if (account.getParentAccountId() != null) {
-            AccountDTO parentAccount = jdbi.withExtension(AccountDAO.class, dao -> {
-                return dao.findById(account.getParentAccountId());
-            });
-            if (parentAccount.getAccountTypeId() != account.getAccountTypeId()) {
+            if (parentAccount == null)
+                parentAccount = jdbi.withExtension(AccountDAO.class, dao ->
+                        dao.findById(account.getParentAccountId())
+                );
+            if (parentAccount.getAccountTypeId() != account.getAccountTypeId())
                 throw new BadRequestException("Account type cannot be different from parent account");
-            }
         }
 
         int accountId = sysSequenceResource.nextValue("account", "account_id", Integer.class);
@@ -52,6 +62,8 @@ public class AccountResource {
         jdbi.useExtension(AccountDAO.class, dao -> {
             dao.createAccount(account);
         });
+
+        logger.info("Account " + account.getAccountCode() + " has been created");
         return account;
     }
 }

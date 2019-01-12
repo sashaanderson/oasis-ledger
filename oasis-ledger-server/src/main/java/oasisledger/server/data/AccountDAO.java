@@ -24,4 +24,8 @@ public interface AccountDAO {
     @RegisterBeanMapper(AccountDTO.class)
     AccountDTO findById(int accountId);
 
+    @SqlQuery("select * from account where account_code = ?")
+    @RegisterBeanMapper(AccountDTO.class)
+    AccountDTO findByCode(String accountCode);
+
 }

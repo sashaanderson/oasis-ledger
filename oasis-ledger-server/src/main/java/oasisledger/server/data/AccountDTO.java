@@ -1,5 +1,7 @@
 package oasisledger.server.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class AccountDTO {
@@ -15,6 +17,12 @@ public class AccountDTO {
     private Integer parentAccountId = null;
     public Integer getParentAccountId() { return parentAccountId; }
     public void setParentAccountId(Integer parentAccountId) { this.parentAccountId = parentAccountId; }
+
+    private String parentAccount = null;
+    @JsonIgnore
+    public String getParentAccount() { return parentAccount; }
+    @JsonProperty
+    public void setParentAccount(String parentAccount) { this.parentAccount = parentAccount; }
 
     @NotEmpty
     private String accountCode;
