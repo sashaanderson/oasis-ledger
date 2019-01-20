@@ -1,12 +1,9 @@
-bootstrap-4.1.2
-  https://getbootstrap.com/docs/4.1/getting-started/download/
-
+bootstrap-4.2.1
+  https://getbootstrap.com/docs/4.2/getting-started/download/
   Dependencies for Bootstrap:
-  https://getbootstrap.com/docs/4.1/getting-started/introduction/
-
-    popper-1.14.3
-      https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js
-    jquery-3.3.1
+  - popper-1.14.6
+      https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js
+  - jquery-3.3.1
       https://code.jquery.com/jquery-3.3.1.slim.min.js
 
 
