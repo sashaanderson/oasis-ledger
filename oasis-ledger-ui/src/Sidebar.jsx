@@ -1,8 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import SvgIcon from './util/SvgIcon';
-
 class Sidebar extends React.Component {
   constructor(props) {
     super(props);
@@ -29,7 +27,7 @@ class Sidebar extends React.Component {
         <a className={"nav-link" + (active ? " active" : "")}
            href="#"
            onClick={this.onClickTab.bind(this, tabIndex)}>
-          <SvgIcon href={"bytesize-symbols:" + iconName}/>
+          <i className={"fa " + iconName}></i>
         </a>
       </li>
     );
@@ -41,8 +39,8 @@ class Sidebar extends React.Component {
       <aside className="oasisledger-sidebar">
         <nav className="oasisledger-sidebar__menu">
           <ul className="nav nav-tabs">
-            {this.renderMenuItem(1, "pages", "i-book")}
-            {this.renderMenuItem(2, "settings", "i-settings")}
+            {this.renderMenuItem(1, "pages", "fa-book")}
+            {this.renderMenuItem(2, "settings", "fa-cog")}
           </ul>
         </nav>
         <div className="oasisledger-sidebar__content">

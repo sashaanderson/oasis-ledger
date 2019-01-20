@@ -4,7 +4,6 @@ import AccountSelect from 'util/AccountSelect';
 import AccountTypeSelect from 'util/AccountTypeSelect';
 import DocumentTitle from 'util/DocumentTitle';
 import FetchContainer, { fetchJSON, fetchText } from 'util/FetchContainer';
-import SvgIcon from 'util/SvgIcon';
 import { mdash } from 'util/unicode';
 
 const Accounts = () => (
@@ -81,7 +80,7 @@ class AccountsMain extends React.Component {
         <div className="container-fluid">
           <p>
             <button type="button" className="btn btn-primary" onClick={this.handleClick}>
-              <SvgIcon href="bytesize-inline:i-plus"/> Create Account
+              <i className="fa fa-plus"></i> Create Account
             </button>
             <AccountCreateModal
               accountTypes={this.props.accountTypes}

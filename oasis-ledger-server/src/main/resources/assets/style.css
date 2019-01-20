@@ -13,10 +13,6 @@ body {
   font-family: 'Roboto', sans-serif;
   color: var(--oasisledger-color-text);
 }
-.i {
-  width: 21px;
-  height: 21px;
-}
 
 .alert {
   overflow-wrap: break-word;
@@ -59,19 +55,15 @@ body {
 .oasisledger-sidebar__menu .nav {
   justify-content: center;
 }
-.oasisledger-sidebar__menu .i {
-  fill: none;
-  stroke: var(--oasisledger-color-secondary-text);
-  stroke-width: 8%;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.oasisledger-sidebar__menu a {
+  color: var(--oasisledger-color-secondary-text);
 }
-.oasisledger-sidebar__menu a:hover .i {
-  stroke: var(--oasisledger-color-accent);
+.oasisledger-sidebar__menu a:hover {
+  color: var(--oasisledger-color-accent);
 }
-.oasisledger-sidebar__menu a.active .i,
-.oasisledger-sidebar__menu a.active:hover .i {
-  stroke: var(--oasisledger-color-primary-text);
+.oasisledger-sidebar__menu a.active,
+.oasisledger-sidebar__menu a.active:hover {
+  color: var(--oasisledger-color-primary-text);
 }
 .oasisledger-sidebar__content {
   overflow: hidden;

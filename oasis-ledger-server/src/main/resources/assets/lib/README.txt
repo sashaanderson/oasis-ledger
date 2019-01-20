@@ -10,14 +10,12 @@ bootstrap-4.1.2
       https://code.jquery.com/jquery-3.3.1.slim.min.js
 
 
-bytesize-icons-1.3
-  https://github.com/danklammer/bytesize-icons/releases
-  bytesize-icons-1.3.zip
+font-awesome-4.7.0
+  https://fontawesome.com/v4.7.0/
 
-    unzip -j bytesize-icons-1.3.zip \
-      'bytesize-icons-1.3/LICENSE.md' \
-      'bytesize-icons-1.3/dist/bytesize-*.svg' \
-      -d bytesize-icons-1.3
+
+google-fonts
+  see google-fonts/README.txt
 
 
 d3-5.5.0
