@@ -19,3 +19,6 @@ d3-5.5.0
   https://github.com/d3/d3/releases > d3.zip
 
 
+momentjs-2.24.0
+  https://momentjs.com/downloads/moment.js
+  https://momentjs.com/downloads/moment.min.js
