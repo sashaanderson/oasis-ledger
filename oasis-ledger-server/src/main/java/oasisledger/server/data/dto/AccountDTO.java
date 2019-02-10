@@ -1,4 +1,4 @@
-package oasisledger.server.data;
+package oasisledger.server.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
