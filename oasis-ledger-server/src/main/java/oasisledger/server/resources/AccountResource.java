@@ -1,15 +1,21 @@
 package oasisledger.server.resources;
 
-import oasisledger.server.data.AccountDAO;
-import oasisledger.server.data.AccountDTO;
+import oasisledger.server.data.dao.AccountDAO;
+import oasisledger.server.data.dto.AccountDTO;
+import oasisledger.server.data.dao.SysSequenceDAO;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.transaction.TransactionIsolationLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,12 +28,10 @@ public class AccountResource {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Jdbi jdbi;
-    private final SysSequenceResource sysSequenceResource;
 
     @Inject
-    public AccountResource(Jdbi jdbi, SysSequenceResource sysSequenceResource) {
+    public AccountResource(Jdbi jdbi) {
         this.jdbi = jdbi;
-        this.sysSequenceResource = sysSequenceResource;
     }
 
     @GET
@@ -43,6 +47,8 @@ public class AccountResource {
             parentAccount = jdbi.withExtension(AccountDAO.class, dao ->
                 dao.findByCode(account.getParentAccount())
             );
+            if (parentAccount == null)
+                throw new BadRequestException("Invalid parent account: " + account.getParentAccount());
             if (account.getParentAccountId() == null)
                 account.setParentAccountId(parentAccount.getAccountId());
             else if (account.getParentAccountId().intValue() != parentAccount.getAccountId())
@@ -57,10 +63,11 @@ public class AccountResource {
                 throw new BadRequestException("Account type cannot be different from parent account");
         }
 
-        int accountId = sysSequenceResource.nextValue("account", "account_id", Integer.class);
-        account.setAccountId(accountId);
-        jdbi.useExtension(AccountDAO.class, dao -> {
-            dao.createAccount(account);
+        jdbi.useTransaction(TransactionIsolationLevel.SERIALIZABLE, h -> {
+            SysSequenceDAO seq = h.attach(SysSequenceDAO.class);
+            int accountId = seq.getAccountId();
+            account.setAccountId(accountId);
+            h.attach(AccountDAO.class).createAccount(account);
         });
 
         logger.info("Account " + account.getAccountCode() + " has been created");
