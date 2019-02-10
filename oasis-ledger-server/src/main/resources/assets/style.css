@@ -104,16 +104,23 @@ body {
   width: 100%;
 }
 
-.oasisledger-datepicker {
-  padding: 0 .5rem;
+.oasisledger-account-input__dropdown-menu {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  max-height: 60vh;
+  overflow-y: auto;
+  min-width: 100%;
 }
-.oasisledger-datepicker__pick-button {
-  width: 2.375em;
-  padding: .375rem;
+
+.oasisledger-datepicker__dropdown-menu {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 .oasisledger-datepicker__weekday-label {
   display: inline-block;
   width: 2.375em;
   text-align: center;
   color: var(--secondary);
+}
+.oasisledger-datepicker__pick-button {
+  width: 2.375em;
+  padding: .375rem;
 }

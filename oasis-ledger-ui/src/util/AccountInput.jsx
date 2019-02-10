@@ -23,12 +23,13 @@ class AccountInput extends React.Component {
 
   handleChange(e) {
     const text = e.target.value;
-    const account = this.props.accounts.find(a => text == a.accountCode + " - " + a.accountName);
+    const account = this.props.accounts && this.props.accounts.find(a => text == a.accountCode + " - " + a.accountName);
     this.setState({
       show: true,
       text: text,
       selectedAccountId: account && account.accountId,
     });
+    this.props.onChange && this.props.onChange(account && account.accountId);
   }
 
   handleClick(accountId, e) {
@@ -78,7 +79,9 @@ class AccountInput extends React.Component {
 
     if (e.keyCode == 27) { // escape
       e.preventDefault();
-      this.setState({ show: false });
+      if (this.state.show) {
+        this.setState({ show: false });
+      }
     }
   
     if (e.keyCode == 40) { // down
@@ -111,6 +114,25 @@ class AccountInput extends React.Component {
   }
 
   renderDropdownMenu() {
+    return (
+      <div className={"dropdown-menu dropdown-menu-right oasisledger-account-input__dropdown-menu" +
+          (this.state.show ? " show" : "")}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        onKeyDown={this.handleKeyDown}
+        ref={this.dropdownMenuRef}
+        tabIndex="-1"
+       >{this.renderDropdownMenuChildren()}
+      </div>
+    );
+  }
+
+  renderDropdownMenuChildren() {
+    if (!this.props.accounts || !this.props.accountTypes) {
+      return (
+        <p className="dropdown-header">Loading...</p>
+      );
+    }
     let accounts, accountTypes;
     if (this.state.text && !this.state.selectedAccountId) {
       accounts = [...new Set(this.props.accounts
@@ -130,39 +152,33 @@ class AccountInput extends React.Component {
       accountTypes = this.props.accountTypes;
     }
     if (accounts.length == 0 || accountTypes.length == 0) {
-      return;
+      return (
+        <p className="dropdown-header">Account(s) not found</p>
+      );
     }
     return (
-      <div className={"shadow dropdown-menu dropdown-menu-right" + (this.state.show ? " show" : "")}
-        style={{maxHeight: "60vh", overflowY: "auto", minWidth: "100%"}}
-        onFocus={this.handleFocus}
-        onBlur={this.handleBlur}
-        onKeyDown={this.handleKeyDown}
-        ref={this.dropdownMenuRef}
-        tabIndex="-1"
-       >{accountTypes.map(accountType => (
-          <React.Fragment key={accountType.accountTypeId}>
-            {accountType !== accountTypes[0] &&
-              <div className="dropdown-divider"></div>
-            }
-            <h6 className="dropdown-header">
-              {accountType.accountTypeCode + " - " + accountType.accountTypeName}
-              {accounts !== this.props.accounts &&
-                <small className="float-right">
-                  Showing {accounts
-                    .filter(account => account.accountTypeId === accountType.accountTypeId).length
-                  } out of {this.props.accounts
-                    .filter(account => account.accountTypeId === accountType.accountTypeId).length
-                  }
-                </small>}
-            </h6>
-            {accounts
-              .filter(account => account.accountTypeId === accountType.accountTypeId)
-              .filter(account => !account.parentAccountId)
-              .map(account => this.renderDropdownItem(account, accounts))}
-          </React.Fragment>
-        ))}
-      </div>
+      accountTypes.map(accountType => (
+        <React.Fragment key={accountType.accountTypeId}>
+          {accountType !== accountTypes[0] &&
+            <div className="dropdown-divider"></div>
+          }
+          <h6 className="dropdown-header">
+            {accountType.accountTypeCode + " - " + accountType.accountTypeName}
+            {accounts !== this.props.accounts &&
+              <small className="float-right">
+                Showing {accounts
+                  .filter(account => account.accountTypeId === accountType.accountTypeId).length
+                } out of {this.props.accounts
+                  .filter(account => account.accountTypeId === accountType.accountTypeId).length
+                }
+              </small>}
+          </h6>
+          {accounts
+            .filter(account => account.accountTypeId === accountType.accountTypeId)
+            .filter(account => !account.parentAccountId)
+            .map(account => this.renderDropdownItem(account, accounts))}
+        </React.Fragment>
+      ))
     );
   }
 
@@ -205,20 +221,17 @@ class AccountInput extends React.Component {
   }
 
   render() {
+    const inputElement = React.Children.only(this.props.children);
     return (
       <React.Fragment>
-        <input
-          type="text"
-          className="form-control"
-          id={this.props.id}
-          placeholder={this.props.placeholder}
-          value={this.state.text}
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          onKeyDown={this.handleKeyDown}
-          ref={this.inputRef}
-        />
+        {React.cloneElement(inputElement, {
+          value: this.state.text,
+          onChange: this.handleChange,
+          onFocus: this.handleFocus,
+          onBlur: this.handleBlur,
+          onKeyDown: this.handleKeyDown,
+          ref: this.inputRef,
+        })}
         {this.renderDropdownMenu()}
       </React.Fragment>
     );
@@ -228,8 +241,7 @@ class AccountInput extends React.Component {
 AccountInput.propTypes = {
   accountTypes: PropTypes.array,
   accounts: PropTypes.array,
-  id: PropTypes.string,
-  placeholder: PropTypes.string,
+  children: PropTypes.element.isRequired,
   onChange: PropTypes.func,
 };
 

@@ -18,8 +18,7 @@ class DatePicker extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
-
-    this.inputRef = React.createRef();
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   static getDerivedStateFromProps(newProps, prevState) {
@@ -29,9 +28,10 @@ class DatePicker extends React.Component {
         firstDate: moment(m).startOf("month"),
         selectedDate: m,
       };
-    }
-    if (!m.isValid()) {
-      return { selectedDate: null };
+    } else if (!m.isValid() && prevState.selectedDate !== null) {
+      return {
+        selectedDate: null,
+      };
     }
   }
 
@@ -65,9 +65,29 @@ class DatePicker extends React.Component {
   handleBlur() {
     this.showTimeoutId = setTimeout(() => {
       if (this.state.show) {
-        this.setState({ show: false });
+        this.setState({
+          show: false,
+          firstDate: moment(this.state.selectedDate || this.today).startOf("month"),
+        });
       }
     }, 0);
+  }
+
+  handleKeyDown(e) {
+    if (e.keyCode == 38 || e.keyCode == 40) { // up or down
+      const dd = e.keyCode == 38 ? 1 : -1;
+      if (this.state.selectedDate) {
+        this.setSelectedDate(moment(this.state.selectedDate).add(dd, "d"), e);
+      } else {
+        this.setSelectedDate(this.today, e);
+      }
+    }
+    if (e.keyCode == 27) { // escape
+      e.preventDefault();
+      if (this.state.show) {
+        this.setState({ show: false });
+      }
+    }
   }
 
   handleHover(m) {
@@ -75,16 +95,17 @@ class DatePicker extends React.Component {
   }
 
   renderPickButton(m) {
-    let btnClass;
+    let btnClass, textClass;
     if (m.isSame(this.state.hoverDate)) {
       btnClass = "btn-outline-warning";
-    } else if (m.isSame(this.state.selectedDate)) {
+    } else if (m.isSame(this.state.selectedDate) && m.isSame(this.today)) {
       btnClass = "btn-primary";
+    } else if (m.isSame(this.state.selectedDate)) {
+      btnClass = "btn-warning";
     } else if (m.isSame(this.today)) {
-      btnClass = "btn-outline-success";
-    }
-    let textClass;
-    if (m.month() != this.state.firstDate.month()) {
+      btnClass = "btn-outline-primary";
+      textClass = "text-primary ";
+    } else if (m.month() != this.state.firstDate.month()) {
       textClass = "text-secondary";
     }
     return (
@@ -94,6 +115,7 @@ class DatePicker extends React.Component {
         onMouseEnter={this.handleHover.bind(this, m)}
         onMouseLeave={this.handleHover.bind(this, null)}
         onClick={this.setSelectedDate.bind(this, m)}
+        tabIndex="-1"
        ><span className={textClass}>
           {m.date()}
         </span>
@@ -107,28 +129,37 @@ class DatePicker extends React.Component {
       startDate.subtract(1, "d");
     }
     return (
-      <div className={"shadow dropdown-menu" + (this.state.show ? " show" : "")}
+      <div className={"dropdown-menu oasisledger-datepicker__dropdown-menu" +
+          (this.state.show ? " show" : "")}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
         tabIndex="-1"
-       ><div className="oasisledger-datepicker">
+       ><div className="px-2 py-0">
           <div className="d-inline-block">
             <div className="d-flex">
-              <a className="btn"
+              <a className="btn align-self-center"
                 href="#" role="button"
                 onClick={this.setFirstDate.bind(this, moment(this.state.firstDate).subtract(1, "M"))}
-               ><i className="fa fa-angle-left" aria-hidden="true"></i>
+                tabIndex="-1"
+               ><i className="fa fa-chevron-left" aria-hidden="true"></i>
               </a>
-              <div className="align-self-center flex-grow-1 text-center">
-                {this.state.firstDate.format("MMMM YYYY")}
-              </div>
-              <a className="btn"
+              <a className="btn align-self-center"
+                href="#" role="button"
+                onClick={this.setSelectedDate.bind(this, this.today)}
+                tabIndex="-1"
+               ><i className="fa fa-circle-o" aria-hidden="true"></i>
+              </a>
+              <a className="btn align-self-center"
                 href="#" role="button"
                 onClick={this.setFirstDate.bind(this, moment(this.state.firstDate).add(1, "M"))}
-               ><i className="fa fa-angle-right" aria-hidden="true"></i>
+                tabIndex="-1"
+               ><i className="fa fa-chevron-right" aria-hidden="true"></i>
               </a>
+              <div className="align-self-center flex-grow-1 pr-2 text-muted text-right">
+                {this.state.firstDate.format("MMMM YYYY")}
+              </div>
             </div>
-            <div>
+            <div className="d-flex">
               {d3.range(7)
                 .map(dd => moment(startDate).add(dd, "d"))
                 .map(m => (
@@ -138,7 +169,7 @@ class DatePicker extends React.Component {
                 ))}
             </div>
             {d3.range(6).map(dw => (
-              <div>
+              <div className="d-flex">
                 {d3.range(7)
                   .map(dd => moment(startDate).add(dw, "w").add(dd, "d"))
                   .map(m => this.renderPickButton(m))}
@@ -151,40 +182,27 @@ class DatePicker extends React.Component {
   }
 
   render() {
+    const inputElement = React.Children.only(this.props.children);
     return (
       <React.Fragment>
-        <input
-          type="text"
-          className="form-control"
-          id={this.props.id}
-          placeholder="MM/DD/YYYY"
-          size="10"
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          value={this.props.value}
-          ref={this.inputRef}
-        />
+        {React.cloneElement(inputElement, {
+          value: this.props.value,
+          onChange: this.handleChange,
+          onFocus: this.handleFocus,
+          onBlur: this.handleBlur,
+          onKeyDown: this.handleKeyDown,
+        })}
         {this.renderDropdownMenu()}
-        <div className="input-group-append">
-          <button
-            className={"btn" +
-              (this.today.isSame(this.state.selectedDate)
-                ? " btn-outline-success"
-                : " btn-outline-secondary")}
-            disabled={this.today.isSame(this.state.selectedDate)}
-            type="button"
-            onClick={this.setSelectedDate.bind(this, this.today)}
-           >Today</button>
-        </div>
       </React.Fragment>
     );
   }
 }
 
 DatePicker.propTypes = {
+  children: PropTypes.element.isRequired,
   id: PropTypes.string,
   onChange: PropTypes.func,
+  value: PropTypes.string,
 };
 
 export default DatePicker;
