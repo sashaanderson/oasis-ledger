@@ -19,9 +19,11 @@ public class AppExceptionMapper implements ExceptionMapper<Exception> {
         String message;
         if (e instanceof WebApplicationException) {
             message = e.getMessage();
+            logger.debug("WebApplicationException occurred: " + e.toString(), e);
         } else if (e instanceof UnableToExecuteStatementException && e.getCause() instanceof SQLiteException) {
             message = e.getCause().getMessage();
             // for example: [SQLITE_CONSTRAINT] Abort due to constraint violation (UNIQUE constraint failed: ...)
+            logger.debug("SQLiteException occurred: " + e.getCause().toString(), e.getCause());
         } else {
             message = e.toString();
             logger.warn("Exception occurred: " + e.toString(), e);
