@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 class DocumentTitle extends React.Component {
   componentDidMount() {
-    document.title = "Oasys Ledger - " + this.props.title;
+    document.title = "Oasis Ledger - " + this.props.title;
   }
   componentWillUnmount() {
-    document.title = "Oasys Ledger";
+    document.title = "Oasis Ledger";
   }
   render() {
     return React.Children.only(this.props.children);

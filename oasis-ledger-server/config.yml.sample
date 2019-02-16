@@ -1,5 +1,5 @@
 database:
-  url: jdbc:sqlite:../oasis-ledger-db/build/oasys-ledger-core.db
+  url: jdbc:sqlite:../oasis-ledger-db/build/oasis-ledger-core.db
 
 logging:
   level: INFO

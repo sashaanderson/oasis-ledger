@@ -38,7 +38,7 @@ def main():
             usage()
         if o in ("-d", "--directory"):
             basedir = a
-    filepath = os.path.join(basedir, "oasys-ledger-core.db")
+    filepath = os.path.join(basedir, "oasis-ledger-core.db")
     if os.path.exists(filepath):
         raise FileExistsError(filepath + " already exists")
     build(filepath)

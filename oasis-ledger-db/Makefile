@@ -1,9 +1,9 @@
 SOURCES := $(shell find src/ -type f)
 
 .PHONY: build
-build: build/oasys-ledger-core.db
+build: build/oasis-ledger-core.db
 
-build/oasys-ledger-core.db: create-db.py $(SOURCES)
+build/oasis-ledger-core.db: create-db.py $(SOURCES)
 	mkdir -p build
 	./create-db.py -d build
 
