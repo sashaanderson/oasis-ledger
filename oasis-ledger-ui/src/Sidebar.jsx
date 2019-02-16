@@ -33,11 +33,22 @@ class Sidebar extends React.Component {
     );
   }
 
+  renderNavItem(url, text) {
+    return (
+      <li className="nav-item">
+        <NavLink to={url} className="nav-link" onClick={this.props.onBlur}>{text}</NavLink>
+      </li>
+    );
+  }
+
   render() {
     const tabOffset = -200 * (this.state.tabIndex - 1);
     return (
-      <aside className="oasisledger-sidebar">
-        <nav className="oasisledger-sidebar__menu">
+      <aside className="oasisledger-sidebar"
+        tabIndex="-1"
+        onFocus={this.props.onFocus}
+        onBlur={this.props.onBlur}
+       ><nav className="oasisledger-sidebar__menu">
           <ul className="nav nav-tabs">
             {this.renderMenuItem(1, "pages", "fa-book")}
             {this.renderMenuItem(2, "settings", "fa-cog")}
@@ -48,9 +59,7 @@ class Sidebar extends React.Component {
             <div className="oasisledger-sidebar__heading">Pages</div>
             <nav className="oasisledger-sidebar__nav">
               <ul className="nav flex-column">
-                <li className="nav-item">
-                  <NavLink to="/dashboard" className="nav-link">Dashboard</NavLink>
-                </li>
+                {this.renderNavItem("/dashboard", "Dashboard")}
               </ul>
             </nav>
           </div>
@@ -58,12 +67,8 @@ class Sidebar extends React.Component {
             <div className="oasisledger-sidebar__heading">Settings</div>
             <nav className="oasisledger-sidebar__nav">
               <ul className="nav flex-column">
-                <li className="nav-item">
-                  <NavLink to="/settings/accounts" className="nav-link">Accounts</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/settings/users" className="nav-link">Users</NavLink>
-                </li>
+                {this.renderNavItem("/settings/accounts", "Accounts")}
+                {this.renderNavItem("/settings/users", "Users")}
               </ul>
             </nav>
           </div>

@@ -3426,12 +3426,12 @@ var DocumentTitle = function (_React$Component) {
   _createClass(DocumentTitle, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      document.title = "Oasys Ledger - " + this.props.title;
+      document.title = "Oasis Ledger - " + this.props.title;
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      document.title = "Oasys Ledger";
+      document.title = "Oasis Ledger";
     }
   }, {
     key: 'render',
@@ -4047,6 +4047,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
@@ -4071,45 +4075,131 @@ var _Sidebar2 = _interopRequireDefault(_Sidebar);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var App = function App() {
-  return _react2.default.createElement(
-    'div',
-    { className: 'oasisledger-root' },
-    _react2.default.createElement(
-      'header',
-      null,
-      _react2.default.createElement(
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var App = function (_React$Component) {
+  _inherits(App, _React$Component);
+
+  function App(props) {
+    _classCallCheck(this, App);
+
+    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+    _this.state = {
+      showMobileSidebar: false
+    };
+    _this.handleFocus = _this.handleFocus.bind(_this);
+    _this.handleClick = _this.handleClick.bind(_this);
+    _this.handleBlur = _this.handleBlur.bind(_this);
+    return _this;
+  }
+
+  _createClass(App, [{
+    key: 'handleFocus',
+    value: function handleFocus() {
+      clearTimeout(this.showMobileSidebarTimeoutId);
+    }
+  }, {
+    key: 'handleClick',
+    value: function handleClick(e) {
+      e.preventDefault();
+      this.setState(function (prevState) {
+        return { showMobileSidebar: !prevState.showMobileSidebar };
+      });
+    }
+  }, {
+    key: 'handleBlur',
+    value: function handleBlur() {
+      var _this2 = this;
+
+      this.showMobileSidebarTimeoutId = setTimeout(function () {
+        if (_this2.state.showMobileSidebar) {
+          _this2.setState({ showMobileSidebar: false });
+        }
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      return _react2.default.createElement(
         'div',
-        { className: 'oasisledger-logo' },
-        'Oasys Ledger'
-      )
-    ),
-    _react2.default.createElement(
-      _reactRouterDom.HashRouter,
-      null,
-      _react2.default.createElement(
-        'div',
-        { className: 'oasisledger-content' },
-        _react2.default.createElement(_reactRouterDom.Route, { path: '/', component: _Sidebar2.default }),
+        { className: 'oasisledger-root' },
         _react2.default.createElement(
-          'main',
-          { className: 'oasisledger-main' },
+          'header',
+          null,
           _react2.default.createElement(
-            _ErrorBoundary2.default,
-            null,
+            'div',
+            { className: 'oasisledger-logo' },
             _react2.default.createElement(
-              _reactRouterDom.Switch,
-              null,
-              _react2.default.createElement(_reactRouterDom.Redirect, { exact: true, from: '/', to: '/dashboard' }),
-              _react2.default.createElement(_reactRouterDom.Route, { path: '/dashboard', component: _Dashboard2.default }),
-              _react2.default.createElement(_reactRouterDom.Route, { path: '/settings', component: _Settings2.default })
+              'div',
+              { className: 'oasisledger-logo__content' },
+              'Oasis Ledger'
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'oasisledger-navbar' },
+            _react2.default.createElement(
+              'a',
+              { href: '#',
+                className: 'oasisledger-navbar__sidebar-toggle',
+                onClick: this.handleClick,
+                onFocus: this.handleFocus,
+                onBlur: this.handleBlur
+              },
+              _react2.default.createElement('i', { className: 'fa fa-bars', 'aria-hidden': 'true' })
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'oasisledger-logo-mobile' },
+              'Oasis Ledger'
+            )
+          )
+        ),
+        _react2.default.createElement(
+          _reactRouterDom.HashRouter,
+          null,
+          _react2.default.createElement(
+            'div',
+            {
+              className: "oasisledger-content" + (this.state.showMobileSidebar ? " oasisledger-content--show-mobile-sidebar" : "") },
+            _react2.default.createElement(_reactRouterDom.Route, { path: '/',
+              render: function render(routeProps) {
+                return _react2.default.createElement(_Sidebar2.default, _extends({}, routeProps, {
+                  onFocus: _this3.handleFocus,
+                  onBlur: _this3.handleBlur
+                }));
+              }
+            }),
+            _react2.default.createElement(
+              'main',
+              { className: 'oasisledger-main' },
+              _react2.default.createElement(
+                _ErrorBoundary2.default,
+                null,
+                _react2.default.createElement(
+                  _reactRouterDom.Switch,
+                  null,
+                  _react2.default.createElement(_reactRouterDom.Redirect, { exact: true, from: '/', to: '/dashboard' }),
+                  _react2.default.createElement(_reactRouterDom.Route, { path: '/dashboard', component: _Dashboard2.default }),
+                  _react2.default.createElement(_reactRouterDom.Route, { path: '/settings', component: _Settings2.default })
+                )
+              )
             )
           )
         )
-      )
-    )
-  );
-};
+      );
+    }
+  }]);
+
+  return App;
+}(_react2.default.Component);
 
 exports.default = App;
 
@@ -4147,7 +4237,7 @@ var Dashboard = function Dashboard() {
       { className: 'row' },
       _react2.default.createElement(
         'div',
-        { className: 'col-md' },
+        { className: 'col-md mb-3' },
         'zzz'
       ),
       _react2.default.createElement(
@@ -4855,6 +4945,7 @@ var AccountInput = function (_React$Component) {
 AccountInput.propTypes = {
   accountTypes: _propTypes2.default.array,
   accounts: _propTypes2.default.array,
+  children: _propTypes2.default.element.isRequired,
   onChange: _propTypes2.default.func
 };
 
@@ -5146,8 +5237,10 @@ var DatePicker = function (_React$Component) {
 }(_react2.default.Component);
 
 DatePicker.propTypes = {
+  children: _propTypes2.default.element.isRequired,
   id: _propTypes2.default.string,
-  onChange: _propTypes2.default.func
+  onChange: _propTypes2.default.func,
+  value: _propTypes2.default.string
 };
 
 exports.default = DatePicker;
@@ -6117,12 +6210,29 @@ var Sidebar = function (_React$Component) {
       );
     }
   }, {
+    key: 'renderNavItem',
+    value: function renderNavItem(url, text) {
+      return _react2.default.createElement(
+        'li',
+        { className: 'nav-item' },
+        _react2.default.createElement(
+          _reactRouterDom.NavLink,
+          { to: url, className: 'nav-link', onClick: this.props.onBlur },
+          text
+        )
+      );
+    }
+  }, {
     key: 'render',
     value: function render() {
       var tabOffset = -200 * (this.state.tabIndex - 1);
       return _react2.default.createElement(
         'aside',
-        { className: 'oasisledger-sidebar' },
+        { className: 'oasisledger-sidebar',
+          tabIndex: '-1',
+          onFocus: this.props.onFocus,
+          onBlur: this.props.onBlur
+        },
         _react2.default.createElement(
           'nav',
           { className: 'oasisledger-sidebar__menu' },
@@ -6150,15 +6260,7 @@ var Sidebar = function (_React$Component) {
               _react2.default.createElement(
                 'ul',
                 { className: 'nav flex-column' },
-                _react2.default.createElement(
-                  'li',
-                  { className: 'nav-item' },
-                  _react2.default.createElement(
-                    _reactRouterDom.NavLink,
-                    { to: '/dashboard', className: 'nav-link' },
-                    'Dashboard'
-                  )
-                )
+                this.renderNavItem("/dashboard", "Dashboard")
               )
             )
           ),
@@ -6176,24 +6278,8 @@ var Sidebar = function (_React$Component) {
               _react2.default.createElement(
                 'ul',
                 { className: 'nav flex-column' },
-                _react2.default.createElement(
-                  'li',
-                  { className: 'nav-item' },
-                  _react2.default.createElement(
-                    _reactRouterDom.NavLink,
-                    { to: '/settings/accounts', className: 'nav-link' },
-                    'Accounts'
-                  )
-                ),
-                _react2.default.createElement(
-                  'li',
-                  { className: 'nav-item' },
-                  _react2.default.createElement(
-                    _reactRouterDom.NavLink,
-                    { to: '/settings/users', className: 'nav-link' },
-                    'Users'
-                  )
-                )
+                this.renderNavItem("/settings/accounts", "Accounts"),
+                this.renderNavItem("/settings/users", "Users")
               )
             )
           )

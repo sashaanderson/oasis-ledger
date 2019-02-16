@@ -7,7 +7,7 @@ import Post from './Post';
 const Dashboard = () => (
   <div className="m-3">
     <div className="row">
-      <div className="col-md">zzz</div>
+      <div className="col-md mb-3">zzz</div>
       <div className="col-md-auto">
         <FetchContainer wait={false} fetch={{
           accountTypes: fetchJSON("api/account-type"),
