@@ -100,8 +100,8 @@ class Post extends React.Component {
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <div className="form-row mb-2">
-          <div className="col-auto">
+        <div className="form-row">
+          <div className="col-auto mb-2">
             <DatePicker
               key={this.state.resetCount}
               onChange={this.setInput.bind(this, "inputDate")}
@@ -117,8 +117,8 @@ class Post extends React.Component {
               />
             </DatePicker>
           </div>
-          <div className="col">
-            <div className="input-group">
+          <div className="col mb-2">
+            <div className="input-group flex-nowrap">
               <select
                 className="custom-select flex-grow-0 w-auto"
                 id="inputCurrency"
@@ -147,38 +147,48 @@ class Post extends React.Component {
         </div>
         <div className="form-row mb-2">
           <div className="col">
-            <AccountInput
-              accountTypes={this.props.accountTypes}
-              accounts={this.props.accounts}
-              key={this.state.resetCount}
-              onChange={this.setInput.bind(this, "inputAccountFrom")}
-             ><input
-                className={"form-control" + (this.state.valid
-                  ? (this.state.valid.inputAccountFrom ? "" : " is-invalid")
-                  : "")}
-                id="inputAccountFrom"
-                placeholder="From..."
-                type="text"
-              />
-            </AccountInput>
+            <div className="input-group">
+              <div className="input-group-prepend">
+                <span className="input-group-text" style={{width: "4.2em"}}>From:</span>
+              </div>
+              <AccountInput
+                accountTypes={this.props.accountTypes}
+                accounts={this.props.accounts}
+                key={this.state.resetCount}
+                onChange={this.setInput.bind(this, "inputAccountFrom")}
+               ><input
+                  className={"form-control" + (this.state.valid
+                    ? (this.state.valid.inputAccountFrom ? "" : " is-invalid")
+                    : "")}
+                  id="inputAccountFrom"
+                  placeholder="Select account..."
+                  type="text"
+                />
+              </AccountInput>
+            </div>
           </div>
         </div>
         <div className="form-row mb-2">
           <div className="col">
-            <AccountInput
-              accountTypes={this.props.accountTypes}
-              accounts={this.props.accounts}
-              key={this.state.resetCount}
-              onChange={this.setInput.bind(this, "inputAccountTo")}
-             ><input
-                className={"form-control" + (this.state.valid
-                  ? (this.state.valid.inputAccountTo ? "" : " is-invalid")
-                  : "")}
-                id="inputAccountTo"
-                placeholder="To..."
-                type="text"
-              />
-            </AccountInput>
+            <div className="input-group">
+              <div className="input-group-prepend">
+                <span className="input-group-text" style={{width: "4.2em"}}>To:</span>
+              </div>
+              <AccountInput
+                accountTypes={this.props.accountTypes}
+                accounts={this.props.accounts}
+                key={this.state.resetCount}
+                onChange={this.setInput.bind(this, "inputAccountTo")}
+               ><input
+                  className={"form-control" + (this.state.valid
+                    ? (this.state.valid.inputAccountTo ? "" : " is-invalid")
+                    : "")}
+                  id="inputAccountTo"
+                  placeholder="Select account..."
+                  type="text"
+                />
+              </AccountInput>
+            </div>
           </div>
         </div>
         <div className="form-group mb-2">

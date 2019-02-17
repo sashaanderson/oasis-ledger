@@ -224,6 +224,7 @@ class AccountInput extends React.Component {
     const inputElement = React.Children.only(this.props.children);
     return (
       <React.Fragment>
+        {this.renderDropdownMenu()}
         {React.cloneElement(inputElement, {
           value: this.state.text,
           onChange: this.handleChange,
@@ -232,7 +233,6 @@ class AccountInput extends React.Component {
           onKeyDown: this.handleKeyDown,
           ref: this.inputRef,
         })}
-        {this.renderDropdownMenu()}
       </React.Fragment>
     );
   }

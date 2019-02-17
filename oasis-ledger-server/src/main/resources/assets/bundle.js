@@ -4416,10 +4416,10 @@ var Post = function (_React$Component) {
         { onSubmit: this.handleSubmit },
         _react2.default.createElement(
           'div',
-          { className: 'form-row mb-2' },
+          { className: 'form-row' },
           _react2.default.createElement(
             'div',
-            { className: 'col-auto' },
+            { className: 'col-auto mb-2' },
             _react2.default.createElement(
               _DatePicker2.default,
               {
@@ -4438,10 +4438,10 @@ var Post = function (_React$Component) {
           ),
           _react2.default.createElement(
             'div',
-            { className: 'col' },
+            { className: 'col mb-2' },
             _react2.default.createElement(
               'div',
-              { className: 'input-group' },
+              { className: 'input-group flex-nowrap' },
               _react2.default.createElement(
                 'select',
                 {
@@ -4480,19 +4480,32 @@ var Post = function (_React$Component) {
             'div',
             { className: 'col' },
             _react2.default.createElement(
-              _AccountInput2.default,
-              {
-                accountTypes: this.props.accountTypes,
-                accounts: this.props.accounts,
-                key: this.state.resetCount,
-                onChange: this.setInput.bind(this, "inputAccountFrom")
-              },
-              _react2.default.createElement('input', {
-                className: "form-control" + (this.state.valid ? this.state.valid.inputAccountFrom ? "" : " is-invalid" : ""),
-                id: 'inputAccountFrom',
-                placeholder: 'From...',
-                type: 'text'
-              })
+              'div',
+              { className: 'input-group' },
+              _react2.default.createElement(
+                'div',
+                { className: 'input-group-prepend' },
+                _react2.default.createElement(
+                  'span',
+                  { className: 'input-group-text', style: { width: "4.2em" } },
+                  'From:'
+                )
+              ),
+              _react2.default.createElement(
+                _AccountInput2.default,
+                {
+                  accountTypes: this.props.accountTypes,
+                  accounts: this.props.accounts,
+                  key: this.state.resetCount,
+                  onChange: this.setInput.bind(this, "inputAccountFrom")
+                },
+                _react2.default.createElement('input', {
+                  className: "form-control" + (this.state.valid ? this.state.valid.inputAccountFrom ? "" : " is-invalid" : ""),
+                  id: 'inputAccountFrom',
+                  placeholder: 'Select account...',
+                  type: 'text'
+                })
+              )
             )
           )
         ),
@@ -4503,19 +4516,32 @@ var Post = function (_React$Component) {
             'div',
             { className: 'col' },
             _react2.default.createElement(
-              _AccountInput2.default,
-              {
-                accountTypes: this.props.accountTypes,
-                accounts: this.props.accounts,
-                key: this.state.resetCount,
-                onChange: this.setInput.bind(this, "inputAccountTo")
-              },
-              _react2.default.createElement('input', {
-                className: "form-control" + (this.state.valid ? this.state.valid.inputAccountTo ? "" : " is-invalid" : ""),
-                id: 'inputAccountTo',
-                placeholder: 'To...',
-                type: 'text'
-              })
+              'div',
+              { className: 'input-group' },
+              _react2.default.createElement(
+                'div',
+                { className: 'input-group-prepend' },
+                _react2.default.createElement(
+                  'span',
+                  { className: 'input-group-text', style: { width: "4.2em" } },
+                  'To:'
+                )
+              ),
+              _react2.default.createElement(
+                _AccountInput2.default,
+                {
+                  accountTypes: this.props.accountTypes,
+                  accounts: this.props.accounts,
+                  key: this.state.resetCount,
+                  onChange: this.setInput.bind(this, "inputAccountTo")
+                },
+                _react2.default.createElement('input', {
+                  className: "form-control" + (this.state.valid ? this.state.valid.inputAccountTo ? "" : " is-invalid" : ""),
+                  id: 'inputAccountTo',
+                  placeholder: 'Select account...',
+                  type: 'text'
+                })
+              )
             )
           )
         ),
@@ -4926,6 +4952,7 @@ var AccountInput = function (_React$Component) {
       return _react2.default.createElement(
         _react2.default.Fragment,
         null,
+        this.renderDropdownMenu(),
         _react2.default.cloneElement(inputElement, {
           value: this.state.text,
           onChange: this.handleChange,
@@ -4933,8 +4960,7 @@ var AccountInput = function (_React$Component) {
           onBlur: this.handleBlur,
           onKeyDown: this.handleKeyDown,
           ref: this.inputRef
-        }),
-        this.renderDropdownMenu()
+        })
       );
     }
   }]);
