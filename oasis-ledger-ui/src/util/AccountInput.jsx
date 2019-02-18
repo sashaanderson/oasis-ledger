@@ -21,13 +21,25 @@ class AccountInput extends React.Component {
     this.dropdownMenuRef = React.createRef();
   }
 
+  componentDidUpdate() {
+    if (this.state.show && this.dropdownMenuIndex == -1) {
+      if (!this.state.selectedAccountId) {
+        $(this.dropdownMenuRef.current).scrollTop(0);
+      } else {
+        const menuItems = $(this.dropdownMenuRef.current).children(".dropdown-item");
+        const i = this.props.accounts.findIndex(a => a.accountId === this.state.selectedAccountId);
+        menuItems[i].scrollIntoView();
+      }
+    }
+  }
+
   handleChange(e) {
     const text = e.target.value;
     const account = this.props.accounts && this.props.accounts.find(a => text == a.accountCode + " - " + a.accountName);
     this.setState({
+      selectedAccountId: account && account.accountId,
       show: true,
       text: text,
-      selectedAccountId: account && account.accountId,
     });
     this.props.onChange && this.props.onChange(account && account.accountId);
   }
@@ -37,8 +49,8 @@ class AccountInput extends React.Component {
     const account = this.props.accounts.find(a => a.accountId === accountId);
     this.setState({
       selectedAccountId: account.accountId,
-      text: account.accountCode + " - " + account.accountName,
       show: false,
+      text: account.accountCode + " - " + account.accountName,
     });
     this.props.onChange && this.props.onChange(account.accountId);
   }
