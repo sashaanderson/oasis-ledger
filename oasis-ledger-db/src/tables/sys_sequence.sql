@@ -6,7 +6,7 @@ CREATE TABLE sys_sequence (
   next_value    INTEGER NOT NULL DEFAULT 1,
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
 
   CONSTRAINT sys_sequence PRIMARY KEY (sequence_id),
   CONSTRAINT sys_sequence UNIQUE (table_name, column_name),
