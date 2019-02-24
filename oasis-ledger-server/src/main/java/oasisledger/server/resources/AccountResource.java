@@ -40,8 +40,7 @@ public class AccountResource {
     }
 
     @POST
-    public AccountDTO create(
-            @NotNull @Valid AccountDTO account) {
+    public AccountDTO create(@NotNull @Valid AccountDTO account) {
         AccountDTO parentAccount = null;
         if (account.getParentAccount() != null) {
             parentAccount = jdbi.withExtension(AccountDAO.class, dao ->

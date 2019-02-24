@@ -13,8 +13,7 @@ import java.util.Map;
 
 public interface AccountDAO {
 
-    @SqlQuery("select account_id, account_type_id, parent_account_id, account_code, account_name, active_flag "
-            + "from account order by account_code")
+    @SqlQuery("select * from account order by account_code")
     @RegisterRowMapper(MapMapper.class)
     List<Map<String, Object>> findAll();
 

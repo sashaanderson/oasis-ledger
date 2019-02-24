@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
+import org.sqlite.SQLiteConfig;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;

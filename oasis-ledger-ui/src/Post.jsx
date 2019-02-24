@@ -10,6 +10,7 @@ class Post extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleClear = this.handleClear.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDismiss = this.handleDismiss.bind(this);
 
     this.defaultInput = {
       inputCurrency: "CAD",
@@ -43,6 +44,7 @@ class Post extends React.Component {
       resetCount: prevState.resetCount + 1,
       input: this.defaultInput,
       valid: null,
+      message: null,
     }));
   }
 
@@ -91,15 +93,25 @@ class Post extends React.Component {
       },
       body: JSON.stringify(postingDTO)
     }).then(posting => {
-      this.setState({ running: false, message: "OK" });
+      this.setState({
+        running: false,
+        message: "Posted successfully: #" + posting.postingHeaderId,
+      });
     }).catch(err => {
-      this.setState({ running: false, message: err });
+      this.setState({
+        running: false,
+        message: err,
+      });
     });
+  }
+
+  handleDismiss() {
+    this.setState({ message: null });
   }
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form className="oasisledger-post-form" onSubmit={this.handleSubmit}>
         <div className="form-row">
           <div className="col-auto mb-2">
             <DatePicker
@@ -113,7 +125,7 @@ class Post extends React.Component {
                 className={"form-control" + (this.state.valid
                   ? (this.state.valid.inputDate ? "" : " is-invalid")
                   : "")}
-                style={{width: "9.5em"}}
+                style={{maxWidth: "9.5em"}}
               />
             </DatePicker>
           </div>
@@ -140,7 +152,7 @@ class Post extends React.Component {
                 placeholder="0.00"
                 onChange={this.handleChange}
                 value={this.getInput("inputAmount")}
-                style={{width: "9.5em"}}
+                style={{minWidth: "5.5em"}}
               />
             </div>
           </div>
@@ -149,7 +161,9 @@ class Post extends React.Component {
           <div className="col">
             <div className="input-group">
               <div className="input-group-prepend">
-                <span className="input-group-text" style={{width: "4.2em"}}>From:</span>
+                <span className="input-group-text">
+                  From:
+                </span>
               </div>
               <AccountInput
                 accountTypes={this.props.accountTypes}
@@ -172,7 +186,9 @@ class Post extends React.Component {
           <div className="col">
             <div className="input-group">
               <div className="input-group-prepend">
-                <span className="input-group-text" style={{width: "4.2em"}}>To:</span>
+                <span className="input-group-text">
+                  To:
+                </span>
               </div>
               <AccountInput
                 accountTypes={this.props.accountTypes}
@@ -200,29 +216,44 @@ class Post extends React.Component {
             value={this.getInput("inputDescription")}
            />
         </div>
-        <div className="form-row align-items-center">
+        <div className="form-row mb-2 align-items-center">
           <div className="col-auto">
             <button
               type="submit"
-              className={"btn btn-primary" + (this.state.running ? " disabled" : "")}
+              className={"btn btn-primary" +
+                (this.state.running ? " disabled" : "")}
              >Post</button>
           </div>
           <div className="col-auto">
             <button
               type="reset"
-              className="btn btn-outline-secondary"
+              className={"btn btn-outline-secondary" +
+                (this.state.running ? " disabled" : "")}
               onClick={this.handleClear}
              >Clear</button>
           </div>
-          <div className="col-auto ml-3">
-            {this.state.running &&
-              <div className="spinner-border spinner-border-sm" role="status">
+          <div className="col ml-2">
+            {this.state.running ? (
+              <div className="spinner-grow spinner-grow-sm text-primary" role="status">
                 <span className="sr-only">Loading...</span>
-              </div>}
-            {(this.state.message instanceof Error)
-              ? this.state.message.message
-              : this.state.message}
+              </div>
+            ) : (this.state.message && !(this.state.message instanceof Error) && (
+              <div className="text-success">
+                {this.state.message}
+              </div>
+            ))}
           </div>
+        </div>
+        <div className="mb-2">
+          {!this.state.running && (this.state.message instanceof Error) && (
+            <div className="alert alert-danger alert-dismissible" role="alert">
+              {this.state.message.message}
+              <button type="button" className="close" data-dismiss="alert" aria-label="Close"
+                onClick={this.handleDismiss}
+               ><span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          )}
         </div>
       </form>
     );

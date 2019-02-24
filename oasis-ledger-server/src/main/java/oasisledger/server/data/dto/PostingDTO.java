@@ -1,20 +1,26 @@
 package oasisledger.server.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostingDTO {
 
     public static class Header {
+
         private long postingHeaderId;
         public long getPostingHeaderId() { return postingHeaderId; }
         public void setPostingHeaderId(long postingHeaderId) { this.postingHeaderId = postingHeaderId; }
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
         @NotNull
         private LocalDate postingDate;
         public LocalDate getPostingDate() { return postingDate; }
@@ -28,16 +34,26 @@ public class PostingDTO {
 
         @NotNull
         @Valid
-        private List<Detail> details;
+        private List<Detail> details = new ArrayList<>();
         public List<Detail> getDetails() { return details; }
         public void setDetails(List<Detail> details) { this.details = details; }
+
+        private int auditUserId;
+        public int getAuditUserId() { return auditUserId; }
+        public void setAuditUserId(int auditUserId) { this.auditUserId = auditUserId; }
+
+        private long auditTs;
+        public long getAuditTs() { return auditTs; }
+        public void setAuditTs(long auditTs) { this.auditTs = auditTs; }
     }
 
     public static class Detail {
+
         private long postingDetailId;
         public long getPostingDetailId() { return postingDetailId; }
         public void setPostingDetailId(long postingDetailId) { this.postingDetailId = postingDetailId; }
 
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
         private long postingHeaderId;
         public long getPostingHeaderId() { return postingHeaderId; }
         public void setPostingHeaderId(long postingHeaderId) { this.postingHeaderId = postingHeaderId; }
@@ -50,6 +66,7 @@ public class PostingDTO {
         public int getCurrencyId() { return currencyId; }
         public void setCurrencyId(int currencyId) { this.currencyId = currencyId; }
 
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
         @Pattern(regexp = "^[A-Z]{3}$")
         @Size(min = 3, max = 3)
         private String currency;

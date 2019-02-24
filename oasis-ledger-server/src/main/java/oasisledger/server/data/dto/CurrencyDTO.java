@@ -18,4 +18,11 @@ public class CurrencyDTO {
     public int getScale() { return scale; }
     public void setScale(int scale) { this.scale = scale; }
 
+    private int auditUserId;
+    public int getAuditUserId() { return auditUserId; }
+    public void setAuditUserId(int auditUserId) { this.auditUserId = auditUserId; }
+
+    private long auditTs;
+    public long getAuditTs() { return auditTs; }
+    public void setAuditTs(long auditTs) { this.auditTs = auditTs; }
 }
