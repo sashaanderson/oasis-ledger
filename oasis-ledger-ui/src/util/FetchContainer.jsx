@@ -28,7 +28,11 @@ class FetchContainer extends React.Component {
   }
 
   renderLoading() {
-    return null;
+    return (
+      <div className="spinner-grow text-primary" role="status">
+        <span className="sr-only">Loading...</span>
+      </div>
+    );
   }
 
   renderError(err) {
