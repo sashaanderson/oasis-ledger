@@ -7,7 +7,7 @@ CREATE TABLE posting_detail (
   statement_id        INTEGER,
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  audit_ts INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
 
   CONSTRAINT posting_detail_pk PRIMARY KEY (posting_detail_id),
   CONSTRAINT posting_detail_fk_ph FOREIGN KEY (posting_header_id)

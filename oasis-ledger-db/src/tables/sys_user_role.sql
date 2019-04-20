@@ -3,7 +3,7 @@ CREATE TABLE sys_user_role (
   role_id       INTEGER NOT NULL,
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
 
   CONSTRAINT sys_user_role_uq_uiri UNIQUE (user_id, role_id),
   CONSTRAINT sys_user_role_fk_ui FOREIGN KEY (user_id)

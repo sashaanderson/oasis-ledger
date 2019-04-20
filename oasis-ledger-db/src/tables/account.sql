@@ -8,7 +8,7 @@ CREATE TABLE account (
   active_flag           CHAR(1) NOT NULL DEFAULT 'Y',
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
 
   CONSTRAINT account_pk PRIMARY KEY (account_id),
   CONSTRAINT account_fk_atid FOREIGN KEY (account_type_id)

@@ -6,7 +6,7 @@ CREATE TABLE sys_user (
   pw            CHAR(60), -- bcrypt hash
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  audit_ts      INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
 
   CONSTRAINT sys_user_pk PRIMARY KEY (user_id),
   CONSTRAINT sys_user_uq_un UNIQUE (user_name),

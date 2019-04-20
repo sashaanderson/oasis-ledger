@@ -8,7 +8,7 @@ CREATE TABLE statement (
   posted            CHAR(1) NOT NULL DEFAULT 'N',
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  audit_ts INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
 
   CONSTRAINT statement_pk PRIMARY KEY (statement_id),
   CONSTRAINT statement_fk_a FOREIGN KEY (account_id)

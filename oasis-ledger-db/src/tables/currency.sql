@@ -5,7 +5,7 @@ CREATE TABLE currency (
   scale             INTEGER NOT NULL DEFAULT 2,
 
   audit_user_id INTEGER NOT NULL DEFAULT 1,
-  audit_ts INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  audit_ts INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
 
   CONSTRAINT currency_pk PRIMARY KEY (currency_id),
   CONSTRAINT currency_uq_cn UNIQUE (currency_code),
