@@ -62,9 +62,9 @@ public class AccountResource {
                 throw new BadRequestException("Account type cannot be different from parent account");
         }
 
+        // use transaction, so as not to increment sequence in case account creation fails
         jdbi.useTransaction(TransactionIsolationLevel.SERIALIZABLE, h -> {
-            SysSequenceDAO seq = h.attach(SysSequenceDAO.class);
-            int accountId = seq.getAccountId();
+            int accountId = h.attach(SysSequenceDAO.class).getAccountId();
             account.setAccountId(accountId);
             h.attach(AccountDAO.class).createAccount(account);
         });
