@@ -2,11 +2,15 @@ package oasisledger.server;
 
 import com.google.common.reflect.ClassPath;
 import com.google.inject.AbstractModule;
+import oasisledger.server.data.DateArgumentFactory;
+import oasisledger.server.data.DateColumnMapper;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.argument.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +25,9 @@ public class DbModule extends AbstractModule {
     public DbModule(Jdbi jdbi) throws IOException {
         this.jdbi = jdbi;
         jdbi.setSqlLogger(new oasisledger.server.data.SqlLogger());
+
+        jdbi.getConfig(Arguments.class).register(new DateArgumentFactory());
+        jdbi.registerColumnMapper(LocalDate.class, new DateColumnMapper());
 
         String packageName = getClass().getPackage().getName() + ".data.repo";
         this.repoClasses = ClassPath.from(ClassLoader.getSystemClassLoader())
