@@ -174,6 +174,8 @@ public class DbTest {
                 LocalDate epochDate = LocalDate.of(1970, 1, 1);
                 long days = ChronoUnit.DAYS.between(epochDate, postingDate);
 
+                assertEquals(days, postingDate.toEpochDay());
+
                 assertEquals(days, ((Number)o2).longValue());
                 assertEquals((int)days, ((Number)o2).intValue());
 

@@ -1,6 +1,7 @@
 package oasisledger.server.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
@@ -77,6 +78,11 @@ public class PostingDTO {
         private BigDecimal amount;
         public BigDecimal getAmount() { return amount; }
         public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+        @JsonIgnore
+        private long rawAmount;
+        public long getRawAmount() { return rawAmount; }
+        public void setRawAmount(long rawAmount) { this.rawAmount = rawAmount; }
 
         private Long statementId;
         public Long getStatementId() { return statementId; }
