@@ -1,4 +1,4 @@
-package oasisledger.server.data;
+package oasisledger.server.data.mappers;
 
 import org.jdbi.v3.core.mapper.ColumnMapper;
 import org.jdbi.v3.core.statement.StatementContext;

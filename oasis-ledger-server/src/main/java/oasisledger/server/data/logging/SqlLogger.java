@@ -1,4 +1,4 @@
-package oasisledger.server.data;
+package oasisledger.server.data.logging;
 
 import org.jdbi.v3.core.statement.StatementContext;
 import org.slf4j.Logger;

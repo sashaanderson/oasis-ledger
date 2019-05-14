@@ -1,6 +1,6 @@
 package oasisledger.server.data.dao;
 
-import oasisledger.server.data.MapMapper;
+import oasisledger.server.data.mappers.MapMapper;
 import oasisledger.server.data.dto.CurrencyDTO;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;

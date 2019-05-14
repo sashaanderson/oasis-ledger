@@ -1,4 +1,4 @@
-package oasisledger.server.data;
+package oasisledger.server.data.mappers;
 
 import org.jdbi.v3.core.argument.AbstractArgumentFactory;
 import org.jdbi.v3.core.argument.Argument;

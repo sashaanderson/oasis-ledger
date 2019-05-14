@@ -3,11 +3,10 @@ package oasisledger.server.data.repo;
 import oasisledger.server.data.dao.*;
 import oasisledger.server.data.dto.CurrencyDTO;
 import oasisledger.server.data.dto.PostingDTO;
+import oasisledger.server.data.mappers.PostingReducer;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.jdbi.v3.core.result.LinkedHashMapRowReducer;
-import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.transaction.TransactionIsolationLevel;
 
 import javax.inject.Inject;
@@ -16,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PostingRepo {
@@ -184,14 +182,4 @@ public class PostingRepo {
                 .collect(Collectors.toList()));
     }
 
-    private static class PostingReducer implements LinkedHashMapRowReducer<Long, PostingDTO.Header> {
-        @Override
-        public void accumulate(Map<Long, PostingDTO.Header> map, RowView rowView) {
-            PostingDTO.Header ph = map.computeIfAbsent(rowView.getColumn("posting_header_id", Long.class),
-                    id -> rowView.getRow(PostingDTO.Header.class));
-            PostingDTO.Detail pd = rowView.getRow(PostingDTO.Detail.class);
-            pd.setAmount(pd.getAmount().movePointLeft(rowView.getColumn("scale", Integer.class)));
-            ph.getDetails().add(pd);
-        }
-    }
 }

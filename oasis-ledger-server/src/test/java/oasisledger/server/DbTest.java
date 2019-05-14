@@ -1,7 +1,7 @@
 package oasisledger.server;
 
-import oasisledger.server.data.DateArgumentFactory;
-import oasisledger.server.data.DateColumnMapper;
+import oasisledger.server.data.mappers.DateArgumentFactory;
+import oasisledger.server.data.mappers.DateColumnMapper;
 import oasisledger.server.data.dao.PostingDAO;
 import oasisledger.server.data.dto.PostingDTO;
 import org.jdbi.v3.core.Handle;

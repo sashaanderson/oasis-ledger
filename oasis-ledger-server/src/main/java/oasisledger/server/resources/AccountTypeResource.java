@@ -1,6 +1,6 @@
 package oasisledger.server.resources;
 
-import oasisledger.server.data.MapMapper;
+import oasisledger.server.data.mappers.MapMapper;
 import org.jdbi.v3.core.Jdbi;
 
 import javax.inject.Inject;
