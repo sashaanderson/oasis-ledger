@@ -1,6 +1,6 @@
 CREATE TABLE account_balance (
-  account_id            INTEGER NOT NULL,
   posting_date          DATE NOT NULL,
+  account_id            INTEGER NOT NULL,
   currency_id           INTEGER NOT NULL,
 
   amount                INTEGER NOT NULL, -- sum(debit)+sum(credits)
