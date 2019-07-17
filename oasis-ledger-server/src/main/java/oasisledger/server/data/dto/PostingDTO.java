@@ -87,5 +87,9 @@ public class PostingDTO {
         private Long statementId;
         public Long getStatementId() { return statementId; }
         public void setStatementId(Long statementId) { this.statementId = statementId; }
+
+        private StatementDTO statement;
+        public StatementDTO getStatement() { return statement; }
+        public void setStatement(StatementDTO statement) { this.statement = statement; }
     }
 }

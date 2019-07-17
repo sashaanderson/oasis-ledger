@@ -4,4 +4,5 @@ VALUES
   (2, 'sys_role', 'role_id', 1001),
   (3, 'account_type', 'account_type_id', 1001),
   (4, 'account', 'account_id', 1),
-  (5, 'posting', 'posting_id', 1);
+  (5, 'posting', 'posting_id', 1),
+  (6, 'statement', 'statement_id', 1);

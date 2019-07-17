@@ -267,6 +267,28 @@ module.exports = warning;
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// Unicode names
+var EN_SPACE = exports.EN_SPACE = "\u2002";
+var EM_SPACE = exports.EM_SPACE = "\u2003";
+var EN_DASH = exports.EN_DASH = "\u2013";
+var EM_DASH = exports.EM_DASH = "\u2014";
+
+// HTML entity names
+var ensp = exports.ensp = EN_SPACE;
+var emsp = exports.emsp = EM_SPACE;
+var ndash = exports.ndash = EN_DASH;
+var mdash = exports.mdash = EM_DASH;
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1805,7 +1827,7 @@ MemoryRouter_MemoryRouter.propTypes = {
 
 /* harmony default export */ var react_router_dom_es_MemoryRouter = (es_MemoryRouter);
 // EXTERNAL MODULE: ./node_modules/path-to-regexp/index.js
-var path_to_regexp = __webpack_require__(6);
+var path_to_regexp = __webpack_require__(7);
 var path_to_regexp_default = /*#__PURE__*/__webpack_require__.n(path_to_regexp);
 
 // CONCATENATED MODULE: ./node_modules/react-router/es/matchPath.js
@@ -2683,7 +2705,7 @@ var withRouter_withRouter = function withRouter(Component) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isarray = __webpack_require__(21)
@@ -3115,7 +3137,7 @@ function pathToRegexp (path, keys, options) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3188,7 +3210,15 @@ var FetchContainer = function (_React$Component) {
   }, {
     key: 'renderLoading',
     value: function renderLoading() {
-      return null;
+      return _react2.default.createElement(
+        'div',
+        { className: 'spinner-grow text-primary', role: 'status' },
+        _react2.default.createElement(
+          'span',
+          { className: 'sr-only' },
+          'Loading...'
+        )
+      );
     }
   }, {
     key: 'renderError',
@@ -3265,28 +3295,6 @@ function fetchText(url, init) {
 }
 
 exports.default = FetchContainer;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-// Unicode names
-var EN_SPACE = exports.EN_SPACE = "\u2002";
-var EM_SPACE = exports.EM_SPACE = "\u2003";
-var EN_DASH = exports.EN_DASH = "\u2013";
-var EM_DASH = exports.EM_DASH = "\u2014";
-
-// HTML entity names
-var ensp = exports.ensp = EN_SPACE;
-var emsp = exports.emsp = EM_SPACE;
-var ndash = exports.ndash = EN_DASH;
-var mdash = exports.mdash = EM_DASH;
 
 /***/ }),
 /* 9 */
@@ -3540,7 +3548,7 @@ var _reactDom = __webpack_require__(14);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactRouterDom = __webpack_require__(5);
+var _reactRouterDom = __webpack_require__(6);
 
 var _App = __webpack_require__(22);
 
@@ -4055,21 +4063,21 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(5);
+var _reactRouterDom = __webpack_require__(6);
 
-var _Dashboard = __webpack_require__(23);
-
-var _Dashboard2 = _interopRequireDefault(_Dashboard);
-
-var _ErrorBoundary = __webpack_require__(27);
+var _ErrorBoundary = __webpack_require__(23);
 
 var _ErrorBoundary2 = _interopRequireDefault(_ErrorBoundary);
 
-var _Settings = __webpack_require__(28);
+var _Postings = __webpack_require__(24);
+
+var _Postings2 = _interopRequireDefault(_Postings);
+
+var _Settings = __webpack_require__(29);
 
 var _Settings2 = _interopRequireDefault(_Settings);
 
-var _Sidebar = __webpack_require__(33);
+var _Sidebar = __webpack_require__(34);
 
 var _Sidebar2 = _interopRequireDefault(_Sidebar);
 
@@ -4186,8 +4194,8 @@ var App = function (_React$Component) {
                 _react2.default.createElement(
                   _reactRouterDom.Switch,
                   null,
-                  _react2.default.createElement(_reactRouterDom.Redirect, { exact: true, from: '/', to: '/dashboard' }),
-                  _react2.default.createElement(_reactRouterDom.Route, { path: '/dashboard', component: _Dashboard2.default }),
+                  _react2.default.createElement(_reactRouterDom.Redirect, { exact: true, from: '/', to: '/postings' }),
+                  _react2.default.createElement(_reactRouterDom.Route, { path: '/postings', component: _Postings2.default }),
                   _react2.default.createElement(_reactRouterDom.Route, { path: '/settings', component: _Settings2.default })
                 )
               )
@@ -4214,21 +4222,111 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _FetchContainer = __webpack_require__(7);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// https://reactjs.org/docs/error-boundaries.html
+
+var ErrorBoundary = function (_React$Component) {
+  _inherits(ErrorBoundary, _React$Component);
+
+  function ErrorBoundary(props) {
+    _classCallCheck(this, ErrorBoundary);
+
+    var _this = _possibleConstructorReturn(this, (ErrorBoundary.__proto__ || Object.getPrototypeOf(ErrorBoundary)).call(this, props));
+
+    _this.state = { err: null };
+    return _this;
+  }
+
+  _createClass(ErrorBoundary, [{
+    key: "render",
+    value: function render() {
+      if (this.state.err) {
+        console.log("Oh sorrow! Error: %o", this.state.err);
+        return _react2.default.createElement(
+          "div",
+          { className: "m-3" },
+          _react2.default.createElement(
+            "div",
+            { className: "alert alert-danger" },
+            _react2.default.createElement(
+              "strong",
+              null,
+              "Oh sorrow!"
+            ),
+            " ",
+            this.state.err.toString()
+          )
+        );
+      }
+      return this.props.children;
+    }
+  }], [{
+    key: "getDerivedStateFromError",
+    value: function getDerivedStateFromError(err) {
+      return { err: err };
+    }
+  }]);
+
+  return ErrorBoundary;
+}(_react2.default.Component);
+
+exports.default = ErrorBoundary;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _FetchContainer = __webpack_require__(8);
 
 var _FetchContainer2 = _interopRequireDefault(_FetchContainer);
 
-var _Post = __webpack_require__(24);
+var _formatters = __webpack_require__(25);
+
+var _unicode = __webpack_require__(5);
+
+var _Post = __webpack_require__(26);
 
 var _Post2 = _interopRequireDefault(_Post);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Dashboard = function Dashboard() {
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Postings = function Postings() {
   return _react2.default.createElement(
     'div',
     { className: 'm-3' },
@@ -4242,7 +4340,7 @@ var Dashboard = function Dashboard() {
       ),
       _react2.default.createElement(
         'div',
-        { className: 'col-md-auto' },
+        { className: 'col-md-auto mb-3' },
         _react2.default.createElement(
           _FetchContainer2.default,
           { wait: false, fetch: {
@@ -4253,14 +4351,240 @@ var Dashboard = function Dashboard() {
           _react2.default.createElement(_Post2.default, null)
         )
       )
+    ),
+    _react2.default.createElement(
+      'div',
+      { className: 'row' },
+      _react2.default.createElement(
+        'div',
+        { className: 'col mb-3' },
+        _react2.default.createElement('hr', null),
+        _react2.default.createElement(
+          _FetchContainer2.default,
+          { fetch: {
+              accounts: (0, _FetchContainer.fetchJSON)("api/account"),
+              currencies: (0, _FetchContainer.fetchJSON)("api/currency"),
+              postings: (0, _FetchContainer.fetchJSON)("api/posting/top")
+            } },
+          _react2.default.createElement(PostingsListing, null)
+        )
+      )
     )
   );
 };
 
-exports.default = Dashboard;
+var PostingsListing = function (_React$Component) {
+  _inherits(PostingsListing, _React$Component);
+
+  function PostingsListing(props) {
+    _classCallCheck(this, PostingsListing);
+
+    return _possibleConstructorReturn(this, (PostingsListing.__proto__ || Object.getPrototypeOf(PostingsListing)).call(this, props));
+  }
+
+  _createClass(PostingsListing, [{
+    key: 'renderPostingsGroup',
+    value: function renderPostingsGroup(postingDate, postingsGroup) {
+      var _this2 = this;
+
+      var m = moment(postingDate);
+      var postingDateText = "Posting date: " + m.format('ddd, MMM Do, YYYY') + function (dd) {
+        return dd == 0 ? " " + _unicode.mdash + " Today" : dd == 1 ? " " + _unicode.mdash + " Yesterday" : dd > 1 ? " " + _unicode.mdash + " " + dd + " days ago" : "";
+      }(moment().diff(m, 'days'));
+      return _react2.default.createElement(
+        _react2.default.Fragment,
+        null,
+        _react2.default.createElement(
+          'h6',
+          { className: 'mt-4' },
+          postingDateText
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'list-group mb-2' },
+          postingsGroup.map(function (posting) {
+            return _react2.default.createElement(
+              'div',
+              { className: 'list-group-item' },
+              _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-auto oasisledger-postings-listing__date' },
+                  (0, _formatters.formatDate)(posting.postingDate)
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm font-weight-bold mb-1' },
+                  posting.description
+                )
+              ),
+              posting.details.filter(function (pd) {
+                return pd.amount > 0;
+              }).map(function (pd) {
+                return _react2.default.createElement(
+                  'div',
+                  { className: 'row' },
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col-sm-auto oasisledger-postings-listing__amount' },
+                    (0, _formatters.formatAmount)(pd.amount)
+                  ),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col-sm text-nowrap' },
+                    _this2.props.accounts.find(function (a) {
+                      return a.accountId === pd.accountId;
+                    }).accountName
+                  ),
+                  _react2.default.createElement('div', { className: 'col-sm-auto text-nowrap' }),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col-md' },
+                    _react2.default.createElement(
+                      'div',
+                      { className: 'row' },
+                      _react2.default.createElement('div', { className: 'col-sm-auto d-block d-md-none', style: { minWidth: "9em" } }),
+                      _react2.default.createElement(
+                        'div',
+                        { className: 'col-sm oasisledger-postings-listing__statement' },
+                        pd.statement && pd.statement.description
+                      )
+                    )
+                  )
+                );
+              }),
+              posting.details.filter(function (pd) {
+                return pd.amount < 0;
+              }).map(function (pd) {
+                return _react2.default.createElement(
+                  'div',
+                  { className: 'row' },
+                  _react2.default.createElement('div', { className: 'col-sm-auto text-nowrap' }),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col-sm-auto text-danger oasisledger-postings-listing__amount' },
+                    (0, _formatters.formatAmount)(pd.amount)
+                  ),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col-sm text-nowrap' },
+                    _this2.props.accounts.find(function (a) {
+                      return a.accountId === pd.accountId;
+                    }).accountName
+                  ),
+                  _react2.default.createElement(
+                    'div',
+                    { className: 'col-md' },
+                    _react2.default.createElement(
+                      'div',
+                      { className: 'row' },
+                      _react2.default.createElement('div', { className: 'col-sm-auto d-block d-md-none' }),
+                      _react2.default.createElement('div', { className: 'col-sm-auto d-block d-md-none', style: { minWidth: "9em" } }),
+                      _react2.default.createElement(
+                        'div',
+                        { className: 'col-sm oasisledger-postings-listing__statement' },
+                        pd.statement && pd.statement.description
+                      )
+                    )
+                  )
+                );
+              })
+            );
+          })
+        )
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      if (!this.props.postings || this.props.postings.length == 0) {
+        return _react2.default.createElement(
+          'div',
+          null,
+          'N/A'
+        );
+      }
+
+      var postings = [].concat(_toConsumableArray(this.props.postings)).sort(function (a, b) {
+        return b.postingDate - a.postingDate;
+      });
+      var postingsGroups = new Map();
+
+      postings.forEach(function (posting) {
+        if (!postingsGroups.has(posting.postingDate)) {
+          postingsGroups.set(posting.postingDate, []);
+        }
+        postingsGroups.get(posting.postingDate).push(posting);
+      });
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'oasisledger-postings-listing' },
+        Array.from(postingsGroups.entries()).map(function (_ref) {
+          var _ref2 = _slicedToArray(_ref, 2),
+              postingDate = _ref2[0],
+              postingsGroup = _ref2[1];
+
+          return _this3.renderPostingsGroup(postingDate, postingsGroup);
+        })
+      );
+      /*
+            .map(ts => (
+              <div>
+                <div>{postingDate}</div>
+                <div className="list-group">
+                  {postings.filter(posting => posting.postingDate == postingDate)
+                    .map(posting => (
+                      <div className="list-group-item">
+                        <div>{posting.description}</div>
+                        <div>{new Date(posting.auditTs).toString()}</div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+      */
+    }
+  }]);
+
+  return PostingsListing;
+}(_react2.default.Component);
+
+exports.default = Postings;
 
 /***/ }),
-/* 24 */
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formatAmount = formatAmount;
+exports.formatDate = formatDate;
+var DEFAULT_DATE_FORMAT = "D MMM YYYY";
+
+function formatAmount(amount) {
+  if (amount == 0) return "-";
+  var s = amount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+  if (s.startsWith("-")) s = "(" + s.substring(1) + ")";
+  return s;
+}
+
+function formatDate(date) {
+  var fmt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULT_DATE_FORMAT;
+
+  var m = moment(date);
+  return m.format(fmt);
+}
+
+/***/ }),
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4276,15 +4600,15 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _AccountInput = __webpack_require__(25);
+var _AccountInput = __webpack_require__(27);
 
 var _AccountInput2 = _interopRequireDefault(_AccountInput);
 
-var _DatePicker = __webpack_require__(26);
+var _DatePicker = __webpack_require__(28);
 
 var _DatePicker2 = _interopRequireDefault(_DatePicker);
 
-var _FetchContainer = __webpack_require__(7);
+var _FetchContainer = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4307,6 +4631,7 @@ var Post = function (_React$Component) {
     _this.handleChange = _this.handleChange.bind(_this);
     _this.handleClear = _this.handleClear.bind(_this);
     _this.handleSubmit = _this.handleSubmit.bind(_this);
+    _this.handleDismiss = _this.handleDismiss.bind(_this);
 
     _this.defaultInput = {
       inputCurrency: "CAD"
@@ -4350,7 +4675,8 @@ var Post = function (_React$Component) {
         return {
           resetCount: prevState.resetCount + 1,
           input: _this2.defaultInput,
-          valid: null
+          valid: null,
+          message: null
         };
       });
     }
@@ -4403,17 +4729,28 @@ var Post = function (_React$Component) {
         },
         body: JSON.stringify(postingDTO)
       }).then(function (posting) {
-        _this3.setState({ running: false, message: "OK" });
+        _this3.setState({
+          running: false,
+          message: "Posted successfully: #" + posting.postingHeaderId
+        });
       }).catch(function (err) {
-        _this3.setState({ running: false, message: err });
+        _this3.setState({
+          running: false,
+          message: err
+        });
       });
+    }
+  }, {
+    key: 'handleDismiss',
+    value: function handleDismiss() {
+      this.setState({ message: null });
     }
   }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
         'form',
-        { onSubmit: this.handleSubmit },
+        { className: 'oasisledger-post-form', onSubmit: this.handleSubmit },
         _react2.default.createElement(
           'div',
           { className: 'form-row' },
@@ -4432,7 +4769,7 @@ var Post = function (_React$Component) {
                 type: 'text',
                 placeholder: 'MM/DD/YYYY',
                 className: "form-control" + (this.state.valid ? this.state.valid.inputDate ? "" : " is-invalid" : ""),
-                style: { width: "9.5em" }
+                style: { maxWidth: "9.5em" }
               })
             )
           ),
@@ -4468,7 +4805,7 @@ var Post = function (_React$Component) {
                 placeholder: '0.00',
                 onChange: this.handleChange,
                 value: this.getInput("inputAmount"),
-                style: { width: "9.5em" }
+                style: { minWidth: "5.5em" }
               })
             )
           )
@@ -4487,7 +4824,7 @@ var Post = function (_React$Component) {
                 { className: 'input-group-prepend' },
                 _react2.default.createElement(
                   'span',
-                  { className: 'input-group-text', style: { width: "4.2em" } },
+                  { className: 'input-group-text' },
                   'From:'
                 )
               ),
@@ -4523,7 +4860,7 @@ var Post = function (_React$Component) {
                 { className: 'input-group-prepend' },
                 _react2.default.createElement(
                   'span',
-                  { className: 'input-group-text', style: { width: "4.2em" } },
+                  { className: 'input-group-text' },
                   'To:'
                 )
               ),
@@ -4558,7 +4895,7 @@ var Post = function (_React$Component) {
         ),
         _react2.default.createElement(
           'div',
-          { className: 'form-row align-items-center' },
+          { className: 'form-row mb-2 align-items-center' },
           _react2.default.createElement(
             'div',
             { className: 'col-auto' },
@@ -4578,7 +4915,7 @@ var Post = function (_React$Component) {
               'button',
               {
                 type: 'reset',
-                className: 'btn btn-outline-secondary',
+                className: "btn btn-outline-secondary" + (this.state.running ? " disabled" : ""),
                 onClick: this.handleClear
               },
               'Clear'
@@ -4586,17 +4923,40 @@ var Post = function (_React$Component) {
           ),
           _react2.default.createElement(
             'div',
-            { className: 'col-auto ml-3' },
-            this.state.running && _react2.default.createElement(
+            { className: 'col ml-2' },
+            this.state.running ? _react2.default.createElement(
               'div',
-              { className: 'spinner-border spinner-border-sm', role: 'status' },
+              { className: 'spinner-grow spinner-grow-sm text-primary', role: 'status' },
               _react2.default.createElement(
                 'span',
                 { className: 'sr-only' },
                 'Loading...'
               )
-            ),
-            this.state.message instanceof Error ? this.state.message.message : this.state.message
+            ) : this.state.message && !(this.state.message instanceof Error) && _react2.default.createElement(
+              'div',
+              { className: 'text-success' },
+              this.state.message
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'mb-2' },
+          !this.state.running && this.state.message instanceof Error && _react2.default.createElement(
+            'div',
+            { className: 'alert alert-danger alert-dismissible', role: 'alert' },
+            this.state.message.message,
+            _react2.default.createElement(
+              'button',
+              { type: 'button', className: 'close', 'data-dismiss': 'alert', 'aria-label': 'Close',
+                onClick: this.handleDismiss
+              },
+              _react2.default.createElement(
+                'span',
+                { 'aria-hidden': 'true' },
+                '\xD7'
+              )
+            )
           )
         )
       );
@@ -4609,7 +4969,7 @@ var Post = function (_React$Component) {
 exports.default = Post;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4629,7 +4989,7 @@ var _propTypes = __webpack_require__(0);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _unicode = __webpack_require__(8);
+var _unicode = __webpack_require__(5);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4666,6 +5026,23 @@ var AccountInput = function (_React$Component) {
   }
 
   _createClass(AccountInput, [{
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      var _this2 = this;
+
+      if (this.state.show && this.dropdownMenuIndex == -1) {
+        if (!this.state.selectedAccountId) {
+          $(this.dropdownMenuRef.current).scrollTop(0);
+        } else {
+          var menuItems = $(this.dropdownMenuRef.current).children(".dropdown-item");
+          var i = this.props.accounts.findIndex(function (a) {
+            return a.accountId === _this2.state.selectedAccountId;
+          });
+          menuItems[i].scrollIntoView();
+        }
+      }
+    }
+  }, {
     key: 'handleChange',
     value: function handleChange(e) {
       var text = e.target.value;
@@ -4673,9 +5050,9 @@ var AccountInput = function (_React$Component) {
         return text == a.accountCode + " - " + a.accountName;
       });
       this.setState({
+        selectedAccountId: account && account.accountId,
         show: true,
-        text: text,
-        selectedAccountId: account && account.accountId
+        text: text
       });
       this.props.onChange && this.props.onChange(account && account.accountId);
     }
@@ -4688,8 +5065,8 @@ var AccountInput = function (_React$Component) {
       });
       this.setState({
         selectedAccountId: account.accountId,
-        text: account.accountCode + " - " + account.accountName,
-        show: false
+        show: false,
+        text: account.accountCode + " - " + account.accountName
       });
       this.props.onChange && this.props.onChange(account.accountId);
     }
@@ -4707,11 +5084,11 @@ var AccountInput = function (_React$Component) {
   }, {
     key: 'handleBlur',
     value: function handleBlur() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.showTimeoutId = setTimeout(function () {
-        if (_this2.state.show) {
-          _this2.setState({ show: false });
+        if (_this3.state.show) {
+          _this3.setState({ show: false });
         }
       }, 0);
     }
@@ -4821,7 +5198,7 @@ var AccountInput = function (_React$Component) {
   }, {
     key: 'renderDropdownMenuChildren',
     value: function renderDropdownMenuChildren() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!this.props.accounts || !this.props.accountTypes) {
         return _react2.default.createElement(
@@ -4834,13 +5211,13 @@ var AccountInput = function (_React$Component) {
           accountTypes = void 0;
       if (this.state.text && !this.state.selectedAccountId) {
         accounts = [].concat(_toConsumableArray(new Set(this.props.accounts.filter(function (account) {
-          return (account.accountCode + " - " + account.accountName).toLowerCase().includes(_this3.state.text.toLowerCase());
+          return (account.accountCode + " - " + account.accountName).toLowerCase().includes(_this4.state.text.toLowerCase());
         }).map(function (account) {
           return account.accountId;
         }).reduce(function (a, accountId) {
-          return a.concat(_this3.findAncestors(accountId)).concat([accountId]).concat(_this3.findDescendants(accountId));
+          return a.concat(_this4.findAncestors(accountId)).concat([accountId]).concat(_this4.findDescendants(accountId));
         }, [])))).map(function (accountId) {
-          return _this3.props.accounts.find(function (account) {
+          return _this4.props.accounts.find(function (account) {
             return account.accountId === accountId;
           });
         });
@@ -4869,7 +5246,7 @@ var AccountInput = function (_React$Component) {
             'h6',
             { className: 'dropdown-header' },
             accountType.accountTypeCode + " - " + accountType.accountTypeName,
-            accounts !== _this3.props.accounts && _react2.default.createElement(
+            accounts !== _this4.props.accounts && _react2.default.createElement(
               'small',
               { className: 'float-right' },
               'Showing ',
@@ -4877,7 +5254,7 @@ var AccountInput = function (_React$Component) {
                 return account.accountTypeId === accountType.accountTypeId;
               }).length,
               ' out of ',
-              _this3.props.accounts.filter(function (account) {
+              _this4.props.accounts.filter(function (account) {
                 return account.accountTypeId === accountType.accountTypeId;
               }).length
             )
@@ -4887,7 +5264,7 @@ var AccountInput = function (_React$Component) {
           }).filter(function (account) {
             return !account.parentAccountId;
           }).map(function (account) {
-            return _this3.renderDropdownItem(account, accounts);
+            return _this4.renderDropdownItem(account, accounts);
           })
         );
       });
@@ -4895,7 +5272,7 @@ var AccountInput = function (_React$Component) {
   }, {
     key: 'renderDropdownItem',
     value: function renderDropdownItem(account, accounts) {
-      var _this4 = this;
+      var _this5 = this;
 
       var depth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
@@ -4917,7 +5294,7 @@ var AccountInput = function (_React$Component) {
         accounts.filter(function (a2) {
           return a2.parentAccountId == account.accountId;
         }).map(function (a2) {
-          return _this4.renderDropdownItem(a2, accounts, depth + 1);
+          return _this5.renderDropdownItem(a2, accounts, depth + 1);
         })
       );
     }
@@ -4978,7 +5355,7 @@ AccountInput.propTypes = {
 exports.default = AccountInput;
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5272,81 +5649,7 @@ DatePicker.propTypes = {
 exports.default = DatePicker;
 
 /***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// https://reactjs.org/docs/error-boundaries.html
-
-var ErrorBoundary = function (_React$Component) {
-  _inherits(ErrorBoundary, _React$Component);
-
-  function ErrorBoundary(props) {
-    _classCallCheck(this, ErrorBoundary);
-
-    var _this = _possibleConstructorReturn(this, (ErrorBoundary.__proto__ || Object.getPrototypeOf(ErrorBoundary)).call(this, props));
-
-    _this.state = { err: null };
-    return _this;
-  }
-
-  _createClass(ErrorBoundary, [{
-    key: "render",
-    value: function render() {
-      if (this.state.err) {
-        console.log("Oh sorrow! Error: %o", this.state.err);
-        return _react2.default.createElement(
-          "div",
-          { className: "m-3" },
-          _react2.default.createElement(
-            "div",
-            { className: "alert alert-danger" },
-            _react2.default.createElement(
-              "strong",
-              null,
-              "Oh sorrow!"
-            ),
-            " ",
-            this.state.err.toString()
-          )
-        );
-      }
-      return this.props.children;
-    }
-  }], [{
-    key: "getDerivedStateFromError",
-    value: function getDerivedStateFromError(err) {
-      return { err: err };
-    }
-  }]);
-
-  return ErrorBoundary;
-}(_react2.default.Component);
-
-exports.default = ErrorBoundary;
-
-/***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5360,13 +5663,13 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(5);
+var _reactRouterDom = __webpack_require__(6);
 
-var _Accounts = __webpack_require__(29);
+var _Accounts = __webpack_require__(30);
 
 var _Accounts2 = _interopRequireDefault(_Accounts);
 
-var _Users = __webpack_require__(32);
+var _Users = __webpack_require__(33);
 
 var _Users2 = _interopRequireDefault(_Users);
 
@@ -5414,7 +5717,7 @@ var SettingsIndex = function SettingsIndex() {
 exports.default = Settings;
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5432,11 +5735,11 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _AccountSelect = __webpack_require__(30);
+var _AccountSelect = __webpack_require__(31);
 
 var _AccountSelect2 = _interopRequireDefault(_AccountSelect);
 
-var _AccountTypeSelect = __webpack_require__(31);
+var _AccountTypeSelect = __webpack_require__(32);
 
 var _AccountTypeSelect2 = _interopRequireDefault(_AccountTypeSelect);
 
@@ -5444,11 +5747,11 @@ var _DocumentTitle = __webpack_require__(10);
 
 var _DocumentTitle2 = _interopRequireDefault(_DocumentTitle);
 
-var _FetchContainer = __webpack_require__(7);
+var _FetchContainer = __webpack_require__(8);
 
 var _FetchContainer2 = _interopRequireDefault(_FetchContainer);
 
-var _unicode = __webpack_require__(8);
+var _unicode = __webpack_require__(5);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5948,7 +6251,7 @@ var AccountCreateModal = function (_React$Component2) {
 exports.default = Accounts;
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5968,7 +6271,7 @@ var _propTypes = __webpack_require__(0);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _unicode = __webpack_require__(8);
+var _unicode = __webpack_require__(5);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6061,7 +6364,7 @@ AccountSelect.propTypes = {
 exports.default = AccountSelect;
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6110,7 +6413,7 @@ var AccountTypeSelect = function AccountTypeSelect(_ref) {
 exports.default = AccountTypeSelect;
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6168,7 +6471,7 @@ var Users = function (_React$Component) {
 exports.default = Users;
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6184,7 +6487,7 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(5);
+var _reactRouterDom = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6286,7 +6589,7 @@ var Sidebar = function (_React$Component) {
               _react2.default.createElement(
                 'ul',
                 { className: 'nav flex-column' },
-                this.renderNavItem("/dashboard", "Dashboard")
+                this.renderNavItem("/postings", "Postings")
               )
             )
           ),

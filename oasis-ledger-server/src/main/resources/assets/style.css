@@ -189,3 +189,24 @@ body {
   width: 2.375em;
   padding: .375rem;
 }
+
+
+.oasisledger-postings-listing__date {
+  min-width: 8em;
+}
+.oasisledger-postings-listing__amount {
+  min-width: 9em;
+}
+@media (min-width: 576px) {
+  .oasisledger-postings-listing__amount {
+    text-align: right;
+  }
+}
+@media (max-width: 575.98px) {
+  .oasisledger-postings-listing .list-group-item .row:not(:first-child) {
+    margin-top: .5em;
+  }
+  .oasisledger-postings-listing__statement {
+    margin-left: 1em;
+  }
+}

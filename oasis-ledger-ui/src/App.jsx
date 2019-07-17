@@ -1,8 +1,8 @@
 import React from 'react';
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 
-import Dashboard from './Dashboard';
 import ErrorBoundary from './ErrorBoundary';
+import Postings from './Postings';
 import Settings from './Settings';
 import Sidebar from './Sidebar';
 
@@ -72,8 +72,8 @@ class App extends React.Component {
             <main className="oasisledger-main">
               <ErrorBoundary>
                 <Switch>
-                  <Redirect exact from="/" to="/dashboard"/>
-                  <Route path="/dashboard" component={Dashboard}/>
+                  <Redirect exact from="/" to="/postings"/>
+                  <Route path="/postings" component={Postings}/>
                   <Route path="/settings" component={Settings}/>
                 </Switch>
               </ErrorBoundary>

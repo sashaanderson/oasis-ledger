@@ -1,6 +1,7 @@
 package oasisledger.server.data.mappers;
 
 import oasisledger.server.data.dto.PostingDTO;
+import oasisledger.server.data.dto.StatementDTO;
 import org.jdbi.v3.core.result.LinkedHashMapRowReducer;
 import org.jdbi.v3.core.result.RowView;
 
@@ -14,5 +15,11 @@ public class PostingReducer implements LinkedHashMapRowReducer<Long, PostingDTO.
         PostingDTO.Detail pd = rowView.getRow(PostingDTO.Detail.class);
         pd.setAmount(pd.getAmount().movePointLeft(rowView.getColumn("scale", Integer.class)));
         ph.getDetails().add(pd);
+
+        Long sid = rowView.getColumn("statement_id", Long.class);
+        if (sid != null && sid > 0) {
+            StatementDTO s = rowView.getRow(StatementDTO.class);
+            pd.setStatement(s);
+        }
     }
 }
