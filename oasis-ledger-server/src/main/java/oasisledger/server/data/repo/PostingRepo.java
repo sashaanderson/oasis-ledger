@@ -135,7 +135,20 @@ public class PostingRepo {
         }
     }
 
-    public List<PostingDTO.Header> fetchTop(int limit) {
+    public List<PostingDTO.Header> findTop(int days) {
+        String where1 = "posting_date >= " + (LocalDate.now().toEpochDay() - days);
+        return find(where1);
+    }
+
+    public List<PostingDTO.Header> findMonth(int month, int year) {
+        LocalDate d1 = LocalDate.of(year, month, 1);
+        LocalDate d2 = d1.plusMonths(1);
+        String where1 = "posting_date >= " + d1.toEpochDay()
+                + " and posting_date < " + d2.toEpochDay();
+        return find(where1);
+    }
+
+    private List<PostingDTO.Header> find(String where1) {
         String sql = String.join(" \n",
                 "select",
                 "  ph.posting_header_id,",
@@ -158,8 +171,8 @@ public class PostingRepo {
                 "  s.posted s_posted",
                 "from (",
                 "  select * from posting_header",
+                "  where " + where1,
                 "  order by posting_date desc, posting_header_id desc",
-                "  limit " + limit,
                 ") ph",
                 "join posting_detail pd",
                 "  on pd.posting_header_id = ph.posting_header_id",
@@ -176,5 +189,4 @@ public class PostingRepo {
                 .reduceRows(new PostingReducer())
                 .collect(Collectors.toList()));
     }
-
 }

@@ -40,7 +40,15 @@ public class PostingResource {
     @GET
     @Path("top")
     public List<PostingDTO.Header> fetchTop(
-            @QueryParam("limit") @DefaultValue("14") IntParam limit) {
-        return postingRepo.fetchTop(limit.get());
+            @QueryParam("days") @DefaultValue("14") IntParam days) {
+        return postingRepo.findTop(days.get());
+    }
+
+    @GET
+    @Path("month")
+    public List<PostingDTO.Header> fetchMonth(
+            @QueryParam("month") IntParam month,
+            @QueryParam("year") IntParam year) {
+        return postingRepo.findMonth(month.get(), year.get());
     }
 }

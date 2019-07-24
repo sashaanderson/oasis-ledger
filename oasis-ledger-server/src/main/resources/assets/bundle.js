@@ -4320,6 +4320,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -4359,15 +4361,7 @@ var Postings = function Postings() {
         'div',
         { className: 'col mb-3' },
         _react2.default.createElement('hr', null),
-        _react2.default.createElement(
-          _FetchContainer2.default,
-          { fetch: {
-              accounts: (0, _FetchContainer.fetchJSON)("api/account"),
-              currencies: (0, _FetchContainer.fetchJSON)("api/currency"),
-              postings: (0, _FetchContainer.fetchJSON)("api/posting/top")
-            } },
-          _react2.default.createElement(PostingsListing, null)
-        )
+        _react2.default.createElement(PostingsListing, null)
       )
     )
   );
@@ -4379,16 +4373,239 @@ var PostingsListing = function (_React$Component) {
   function PostingsListing(props) {
     _classCallCheck(this, PostingsListing);
 
-    return _possibleConstructorReturn(this, (PostingsListing.__proto__ || Object.getPrototypeOf(PostingsListing)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (PostingsListing.__proto__ || Object.getPrototypeOf(PostingsListing)).call(this, props));
+
+    _this.state = {
+      input: { month: 0, year: 0 },
+      top: { days: 14, key: 1 } // { days: N } or { month: M, year: Y }
+    };
+
+    _this.handleChange = _this.handleChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
   }
 
   _createClass(PostingsListing, [{
+    key: 'setInput',
+    value: function setInput(id, value) {
+      this.setState(function (prevState) {
+        return {
+          input: Object.assign({}, prevState.input, _defineProperty({}, id, value))
+        };
+      });
+    }
+  }, {
+    key: 'handleChange',
+    value: function handleChange(e) {
+      var id = e.target.id.replace(/Input$/, '');
+      this.setInput(id, e.target.value);
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(e) {
+      e.preventDefault();
+      var m = this.state.input.month;
+      var y = this.state.input.year;
+      if (m && y) {
+        this.setState({ top: {
+            month: m,
+            year: y,
+            key: this.state.top.key + 1
+          } });
+      }
+    }
+  }, {
+    key: 'handleClick',
+    value: function handleClick(days) {
+      this.setState({ top: {
+          days: days,
+          key: this.state.top.key + 1
+        } });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'form',
+          { className: 'mb-3', onSubmit: this.handleSubmit },
+          _react2.default.createElement(
+            'div',
+            { className: 'form-row' },
+            _react2.default.createElement(
+              'div',
+              { className: 'col-auto my-1' },
+              _react2.default.createElement(
+                'div',
+                { className: 'input-group' },
+                _react2.default.createElement(
+                  'select',
+                  { className: 'custom-select',
+                    id: 'monthInput',
+                    value: this.state.input.month,
+                    onChange: this.handleChange
+                  },
+                  _react2.default.createElement(
+                    'option',
+                    { value: '0', selected: true },
+                    'Month'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '1' },
+                    'January'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '2' },
+                    'February'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '3' },
+                    'March'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '4' },
+                    'April'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '5' },
+                    'May'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '6' },
+                    'June'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '7' },
+                    'July'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '8' },
+                    'August'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '9' },
+                    'September'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '10' },
+                    'October'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '11' },
+                    'November'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    { value: '12' },
+                    'December'
+                  )
+                ),
+                _react2.default.createElement(
+                  'select',
+                  { className: 'custom-select',
+                    id: 'yearInput',
+                    value: this.state.input.year,
+                    onChange: this.handleChange
+                  },
+                  _react2.default.createElement(
+                    'option',
+                    { value: '0', selected: true },
+                    'Year'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    null,
+                    '2018'
+                  ),
+                  _react2.default.createElement(
+                    'option',
+                    null,
+                    '2019'
+                  )
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'input-group-append' },
+                  _react2.default.createElement(
+                    'button',
+                    { type: 'submit',
+                      className: 'btn btn-outline-primary',
+                      disabled: !this.state.input.month || !this.state.input.year
+                    },
+                    'View'
+                  )
+                )
+              )
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'col-auto my-1' },
+              _react2.default.createElement(
+                'div',
+                { className: 'btn-group' },
+                _react2.default.createElement(
+                  'button',
+                  { type: 'button', className: 'btn btn-outline-primary',
+                    onClick: this.handleClick.bind(this, 14)
+                  },
+                  '14 days'
+                ),
+                _react2.default.createElement(
+                  'button',
+                  { type: 'button', className: 'btn btn-outline-primary',
+                    onClick: this.handleClick.bind(this, 30)
+                  },
+                  '30 days'
+                )
+              )
+            )
+          )
+        ),
+        _react2.default.createElement(
+          _FetchContainer2.default,
+          { key: this.state.top.key, fetch: {
+              accounts: (0, _FetchContainer.fetchJSON)("api/account"),
+              currencies: (0, _FetchContainer.fetchJSON)("api/currency"),
+              postings: this.state.top.days ? (0, _FetchContainer.fetchJSON)("api/posting/top?days=" + this.state.top.days) : (0, _FetchContainer.fetchJSON)("api/posting/month?year=" + this.state.top.year + "&month=" + this.state.top.month)
+            } },
+          _react2.default.createElement(PostingsListingResults, { top: this.state.top })
+        )
+      );
+    }
+  }]);
+
+  return PostingsListing;
+}(_react2.default.Component);
+
+var PostingsListingResults = function (_React$Component2) {
+  _inherits(PostingsListingResults, _React$Component2);
+
+  function PostingsListingResults(props) {
+    _classCallCheck(this, PostingsListingResults);
+
+    return _possibleConstructorReturn(this, (PostingsListingResults.__proto__ || Object.getPrototypeOf(PostingsListingResults)).call(this, props));
+  }
+
+  _createClass(PostingsListingResults, [{
     key: 'renderPostingsGroup',
     value: function renderPostingsGroup(postingDate, postingsGroup) {
-      var _this2 = this;
+      var _this3 = this;
 
       var m = moment(postingDate);
-      var postingDateText = "Posting date: " + m.format('ddd, MMM Do, YYYY') + function (dd) {
+      var postingDateText = m.format('ddd, MMM Do, YYYY') + function (dd) {
         return dd == 0 ? " " + _unicode.mdash + " Today" : dd == 1 ? " " + _unicode.mdash + " Yesterday" : dd > 1 ? " " + _unicode.mdash + " " + dd + " days ago" : "";
       }(moment().diff(m, 'days'));
       return _react2.default.createElement(
@@ -4434,7 +4651,7 @@ var PostingsListing = function (_React$Component) {
                   _react2.default.createElement(
                     'div',
                     { className: 'col-sm text-nowrap' },
-                    _this2.props.accounts.find(function (a) {
+                    _this3.props.accounts.find(function (a) {
                       return a.accountId === pd.accountId;
                     }).accountName
                   ),
@@ -4470,7 +4687,7 @@ var PostingsListing = function (_React$Component) {
                   _react2.default.createElement(
                     'div',
                     { className: 'col-sm text-nowrap' },
-                    _this2.props.accounts.find(function (a) {
+                    _this3.props.accounts.find(function (a) {
                       return a.accountId === pd.accountId;
                     }).accountName
                   ),
@@ -4499,17 +4716,9 @@ var PostingsListing = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
-      if (!this.props.postings || this.props.postings.length == 0) {
-        return _react2.default.createElement(
-          'div',
-          null,
-          'N/A'
-        );
-      }
-
-      var postings = [].concat(_toConsumableArray(this.props.postings)).sort(function (a, b) {
+      var postings = [].concat(_toConsumableArray(this.props.postings || [])).sort(function (a, b) {
         return b.postingDate - a.postingDate;
       });
       var postingsGroups = new Map();
@@ -4524,12 +4733,23 @@ var PostingsListing = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { className: 'oasisledger-postings-listing' },
+        _react2.default.createElement(
+          'p',
+          null,
+          'Found ',
+          postings.length,
+          ' posting',
+          postings.length == 1 ? "" : "s",
+          ' in ',
+          this.props.top.days ? "the past " + this.props.top.days + " days" : "month " + this.props.top.month + " year " + this.props.top.year,
+          '.'
+        ),
         Array.from(postingsGroups.entries()).map(function (_ref) {
           var _ref2 = _slicedToArray(_ref, 2),
               postingDate = _ref2[0],
               postingsGroup = _ref2[1];
 
-          return _this3.renderPostingsGroup(postingDate, postingsGroup);
+          return _this4.renderPostingsGroup(postingDate, postingsGroup);
         })
       );
       /*
@@ -4550,7 +4770,7 @@ var PostingsListing = function (_React$Component) {
     }
   }]);
 
-  return PostingsListing;
+  return PostingsListingResults;
 }(_react2.default.Component);
 
 exports.default = Postings;

@@ -23,20 +23,7 @@ const Postings = () => (
     <div className="row">
       <div className="col mb-3">
         <hr/>
-        {/*
-        <div className="card mb-3">
-          <div className="card-body">
-            Sort by: ...
-          </div>
-        </div>
-        */}
-        <FetchContainer fetch={{
-          accounts: fetchJSON("api/account"),
-          currencies: fetchJSON("api/currency"),
-          postings: fetchJSON("api/posting/top"),
-        }}>
-          <PostingsListing/>
-        </FetchContainer>
+        <PostingsListing/>
       </div>
     </div>
   </div>
@@ -45,11 +32,129 @@ const Postings = () => (
 class PostingsListing extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      input: { month: 0, year: 0 },
+      top: { days: 14, key: 1 }, // { days: N } or { month: M, year: Y }
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  setInput(id, value) {
+    this.setState(prevState => ({
+      input: Object.assign({}, prevState.input, { [id]: value }),
+    }));
+  }
+  handleChange(e) {
+    const id = e.target.id.replace(/Input$/, '');
+    this.setInput(id, e.target.value);
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const m = this.state.input.month;
+    const y = this.state.input.year;
+    if (m && y) {
+      this.setState({ top: {
+        month: m,
+        year: y,
+        key: this.state.top.key + 1
+      }});
+    }
+  }
+
+  handleClick(days) {
+    this.setState({ top: {
+      days: days,
+      key: this.state.top.key + 1
+    }});
+  }
+
+  render() {
+    return (
+      <div>
+        <form className="mb-3" onSubmit={this.handleSubmit}>
+          <div className="form-row">
+            <div className="col-auto my-1">
+              <div className="input-group">
+                <select className="custom-select"
+                  id="monthInput"
+                  value={this.state.input.month}
+                  onChange={this.handleChange}
+                >
+                  <option value="0" selected>Month</option>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+                <select className="custom-select"
+                  id="yearInput"
+                  value={this.state.input.year}
+                  onChange={this.handleChange}
+                >
+                  <option value="0" selected>Year</option>
+                  <option>2018</option>
+                  <option>2019</option>
+                </select>
+                <div className="input-group-append">
+                  <button type="submit"
+                    className="btn btn-outline-primary"
+                    disabled={!this.state.input.month || !this.state.input.year}
+                  >View</button>
+                </div>
+              </div>
+            </div>
+            <div className="col-auto my-1">
+              <div className="btn-group">
+                <button type="button" className="btn btn-outline-primary"
+                  onClick={this.handleClick.bind(this, 14)}
+                >14 days</button>
+                <button type="button" className="btn btn-outline-primary"
+                  onClick={this.handleClick.bind(this, 30)}
+                >30 days</button>
+              </div>
+            </div>
+          </div>
+        </form>
+        {/*
+        <div className="card bg-light mb-3">
+          <div className="card-body">
+            Month... Year... View ....... Last 30 days ... Last 14 days 
+          </div>
+        </div>
+        */}
+        <FetchContainer key={this.state.top.key} fetch={{
+          accounts: fetchJSON("api/account"),
+          currencies: fetchJSON("api/currency"),
+          postings: this.state.top.days
+            ? fetchJSON("api/posting/top?days=" + this.state.top.days)
+            : fetchJSON("api/posting/month?year=" + this.state.top.year + "&month=" + this.state.top.month)
+        }}>
+          <PostingsListingResults top={this.state.top}/>
+        </FetchContainer>
+      </div>
+    );
+  }
+}
+
+class PostingsListingResults extends React.Component {
+  constructor(props) {
+    super(props);
   }
 
   renderPostingsGroup(postingDate, postingsGroup) {
     const m = moment(postingDate);
-    const postingDateText = "Posting date: " + m.format('ddd, MMM Do, YYYY') +
+    const postingDateText = m.format('ddd, MMM Do, YYYY') +
       (dd =>
         dd == 0 ? " " + mdash + " Today" : 
         dd == 1 ? " " + mdash + " Yesterday" :
@@ -111,13 +216,7 @@ class PostingsListing extends React.Component {
   }
 
   render() {
-    if (!this.props.postings || this.props.postings.length == 0) {
-      return (
-        <div>N/A</div>
-      );
-    }
-
-    const postings = [...this.props.postings].sort((a, b) => b.postingDate - a.postingDate);
+    const postings = [...this.props.postings || []].sort((a, b) => b.postingDate - a.postingDate);
     const postingsGroups = new Map();
 
     postings.forEach(posting => {
@@ -129,6 +228,10 @@ class PostingsListing extends React.Component {
 
     return (
       <div className="oasisledger-postings-listing">
+        <p>Found {postings.length} posting{postings.length == 1 ? "" : "s"} in {
+          this.props.top.days
+            ? "the past " + this.props.top.days + " days"
+            : "month " + this.props.top.month + " year " + this.props.top.year}.</p>
         {Array.from(postingsGroups.entries())
           .map(([postingDate, postingsGroup]) =>
             this.renderPostingsGroup(postingDate, postingsGroup)
