@@ -1,5 +1,6 @@
-*.iml
-.idea/
-config.yml
-log/
-target/
+/*.iml
+/.idea/
+/config.yml
+/log/
+/oasis-ledger-core.db
+/target/
