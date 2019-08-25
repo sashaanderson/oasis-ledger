@@ -1,10 +1,8 @@
 package oasisledger.server.resources;
 
 import io.dropwizard.jersey.params.IntParam;
-import io.dropwizard.jersey.params.LongParam;
 import oasisledger.server.data.dto.PostingDTO;
 import oasisledger.server.data.repo.PostingRepo;
-import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +20,10 @@ public class PostingResource {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Jdbi jdbi;
     private final PostingRepo postingRepo;
 
     @Inject
-    public PostingResource(Jdbi jdbi, PostingRepo postingRepo) {
-        this.jdbi = jdbi;
+    public PostingResource(PostingRepo postingRepo) {
         this.postingRepo = postingRepo;
     }
 
