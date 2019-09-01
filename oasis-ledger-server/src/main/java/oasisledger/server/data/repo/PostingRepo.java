@@ -110,8 +110,8 @@ public class PostingRepo {
 
             AccountBalanceDAO abdao = h.attach(AccountBalanceDAO.class);
             ph.getDetails().forEach(pd -> {
-                abdao.insertDate(ph.getPostingDate(), pd.getAccountId(), pd.getCurrencyId());
-                abdao.updateAmount(ph.getPostingDate(), pd.getAccountId(), pd.getCurrencyId(), pd.getRawAmount());
+                abdao.insertDate(pd.getAccountId(), pd.getCurrencyId(), ph.getPostingDate());
+                abdao.updateAmount(pd.getAccountId(), pd.getCurrencyId(), ph.getPostingDate(), pd.getRawAmount());
             });
         });
     }

@@ -7,8 +7,8 @@ import java.time.LocalDate;
 
 public interface AccountBalanceDAO {
 
-    @SqlUpdate("insert into account_balance (posting_date, account_id, currency_id, amount) "
-            + "select :postingDate, :accountId, :currencyId, coalesce("
+    @SqlUpdate("insert into account_balance (account_id, currency_id, posting_date, posting_count, amount) "
+            + "select :accountId, :currencyId, :postingDate, 0, coalesce("
             + " (select amount from account_balance "
             + "  where account_id = :accountId "
             + "  and currency_id = :currencyId "
@@ -20,22 +20,24 @@ public interface AccountBalanceDAO {
             + "    and posting_date < :postingDate)), 0)"
             + "where not exists ("
             + "  select 1 from account_balance "
-            + "  where posting_date = :postingDate "
-            + "  and account_id = :accountId "
-            + "  and currency_id = :currencyId"
+            + "  where account_id = :accountId "
+            + "  and currency_id = :currencyId "
+            + "  and posting_date = :postingDate "
             + ")")
-    void insertDate(@Bind("postingDate") LocalDate postingDate,
-                    @Bind("accountId") int accountId,
-                    @Bind("currencyId") int currencyId);
+    void insertDate(@Bind("accountId") int accountId,
+                    @Bind("currencyId") int currencyId,
+                    @Bind("postingDate") LocalDate postingDate);
 
     @SqlUpdate("update account_balance "
-            + "set amount = amount + :rawAmount, reconciled = 'N' "
-            + "where posting_date >= :postingDate "
-            + "and account_id = :accountId "
-            + "and currency_id = :currencyId")
-    void updateAmount(@Bind("postingDate") LocalDate postingDate,
-                      @Bind("accountId") int accountId,
+            + "set amount = amount + :rawAmount, "
+            + "  reconciled = 'N', "
+            + "  posting_count = posting_count + 1 "
+            + "where account_id = :accountId "
+            + "and currency_id = :currencyId "
+            + "and posting_date >= :postingDate")
+    void updateAmount(@Bind("accountId") int accountId,
                       @Bind("currencyId") int currencyId,
+                      @Bind("postingDate") LocalDate postingDate,
                       @Bind("rawAmount") long rawAmount);
 
 }
