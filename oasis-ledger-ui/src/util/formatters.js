@@ -1,4 +1,4 @@
-const DEFAULT_DATE_FORMAT = "D MMM YYYY";
+import { mdash } from 'util/unicode';
 
 export function formatAmount(amount) {
   if (amount == 0) return "-";
@@ -8,7 +8,18 @@ export function formatAmount(amount) {
   return s;
 }
 
-export function formatDate(date, fmt = DEFAULT_DATE_FORMAT) {
-  let m = moment(date);
-  return m.format(fmt);
+export function formatDateLong(date) {
+  const m = moment(date);
+  const s = m.format('ddd, MMM Do, YYYY');
+  const dd = moment().diff(m, 'days');
+  return (
+    dd == 0 ? s + " " + mdash + " Today" :
+    dd == 1 ? s + " " + mdash + " Yesterday" :
+    dd > 1 ? s + " " + mdash + " " + dd + " days ago" : s
+  );
+}
+
+export function formatDateShort(date) {
+  const m = moment(date);
+  return m.format("D MMM YYYY");
 }

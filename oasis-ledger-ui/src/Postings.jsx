@@ -1,8 +1,7 @@
 import React from 'react';
 
 import FetchContainer, { fetchJSON } from 'util/FetchContainer';
-import { formatAmount, formatDate } from 'util/formatters';
-import { emsp, mdash } from 'util/unicode';
+import { formatAmount, formatDateShort, formatDateLong } from 'util/formatters';
 
 import Post from './Post';
 
@@ -153,22 +152,15 @@ class PostingsListingResults extends React.Component {
   }
 
   renderPostingsGroup(postingDate, postingsGroup) {
-    const m = moment(postingDate);
-    const postingDateText = m.format('ddd, MMM Do, YYYY') +
-      (dd =>
-        dd == 0 ? " " + mdash + " Today" : 
-        dd == 1 ? " " + mdash + " Yesterday" :
-        dd > 1 ? " " + mdash + " " + dd + " days ago" : ""
-      )(moment().diff(m, 'days'));
     return (
       <React.Fragment>
-        <h6 className="mt-4">{postingDateText}</h6>
+        <h6 className="mt-4">{formatDateLong(postingDate)}</h6>
         <div className="list-group mb-2">
           {postingsGroup.map(posting => (
             <div className="list-group-item">
               <div className="row">
                 <div className="col-sm-auto oasisledger-postings-listing__date">
-                  {formatDate(posting.postingDate)}
+                  {formatDateShort(posting.postingDate)}
                 </div>
                 <div className="col-sm font-weight-bold mb-1">{posting.description}</div>
               </div>
