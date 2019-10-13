@@ -1,6 +1,7 @@
 import React from 'react';
 import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
 
+import Balances from './Balances';
 import ErrorBoundary from './ErrorBoundary';
 import Postings from './Postings';
 import Settings from './Settings';
@@ -74,6 +75,7 @@ class App extends React.Component {
                 <Switch>
                   <Redirect exact from="/" to="/postings"/>
                   <Route path="/postings" component={Postings}/>
+                  <Route path="/balances" component={Balances}/>
                   <Route path="/settings" component={Settings}/>
                 </Switch>
               </ErrorBoundary>

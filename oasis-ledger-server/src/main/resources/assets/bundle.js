@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 13);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,7 +98,7 @@
 if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else {
   // By explicitly using `prop-types` you are opting into new production behavior.
   // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(19)();
+  module.exports = __webpack_require__(20)();
 }
 
 
@@ -110,7 +110,7 @@ if (false) { var throwOnDirectAccess, isValidElement, REACT_ELEMENT_TYPE; } else
 
 
 if (true) {
-  module.exports = __webpack_require__(13);
+  module.exports = __webpack_require__(14);
 } else {}
 
 
@@ -289,6 +289,166 @@ var mdash = exports.mdash = EM_DASH;
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+exports.fetchCheck = fetchCheck;
+exports.fetchJSON = fetchJSON;
+exports.fetchText = fetchText;
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(0);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FetchContainer = function (_React$Component) {
+  _inherits(FetchContainer, _React$Component);
+
+  function FetchContainer(props) {
+    _classCallCheck(this, FetchContainer);
+
+    var _this = _possibleConstructorReturn(this, (FetchContainer.__proto__ || Object.getPrototypeOf(FetchContainer)).call(this, props));
+
+    _this.state = {
+      err: null,
+      fetchResults: null
+    };
+    return _this;
+  }
+
+  _createClass(FetchContainer, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.load();
+    }
+  }, {
+    key: 'load',
+    value: function load() {
+      var _this2 = this;
+
+      var fetchKeys = Object.keys(this.props.fetch);
+      Promise.all(fetchKeys.map(function (key) {
+        return Promise.resolve(_this2.props.fetch[key]);
+      })).then(function (values) {
+        var fetchResults = {};
+        fetchKeys.forEach(function (key, i) {
+          return fetchResults[key] = values[i];
+        });
+        _this2.setState({ fetchResults: fetchResults });
+      }).catch(function (err) {
+        _this2.setState({ err: err });
+      });
+    }
+  }, {
+    key: 'renderLoading',
+    value: function renderLoading() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'spinner-grow text-primary', role: 'status' },
+        _react2.default.createElement(
+          'span',
+          { className: 'sr-only' },
+          'Loading...'
+        )
+      );
+    }
+  }, {
+    key: 'renderError',
+    value: function renderError(err) {
+      console.log("Oh sorrow! Error: %o", err);
+      return _react2.default.createElement(
+        'div',
+        { className: 'alert alert-danger' },
+        _react2.default.createElement(
+          'strong',
+          null,
+          'Oh sorrow!'
+        ),
+        ' ',
+        err.toString()
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      if (this.state.err) {
+        return this.renderError(this.state.err);
+      }
+      if (this.props.wait && !this.state.fetchResults) {
+        return this.renderLoading();
+      }
+      var onlyChild = _react2.default.Children.only(this.props.children);
+      return _react2.default.cloneElement(onlyChild, this.state.fetchResults);
+    }
+  }]);
+
+  return FetchContainer;
+}(_react2.default.Component);
+
+FetchContainer.propTypes = {
+  children: _propTypes2.default.element.isRequired,
+  fetch: _propTypes2.default.object.isRequired,
+  wait: _propTypes2.default.bool
+};
+
+FetchContainer.defaultProps = {
+  wait: true
+};
+
+function fetchCheck(res) {
+  if (res.ok) {
+    return res;
+  } else {
+    return res.text().then(function (text) {
+      throw new Error(text ? text : res.statusText);
+    }, function (err) {
+      throw new Error(res.statusText);
+    }).catch(function (err) {
+      console.error("Error in fetchCheck: %o", err);
+      throw err;
+    });
+  }
+}
+
+function fetchWithCheck(url, init) {
+  return fetch(url, Object.assign({ method: 'get' }, init)).then(fetchCheck);
+}
+
+function fetchJSON(url, init) {
+  return fetchWithCheck(url, init).then(function (res) {
+    return res.json();
+  });
+}
+
+function fetchText(url, init) {
+  return fetchWithCheck(url, init).then(function (res) {
+    return res.text();
+  });
+}
+
+exports.default = FetchContainer;
+
+/***/ }),
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1827,7 +1987,7 @@ MemoryRouter_MemoryRouter.propTypes = {
 
 /* harmony default export */ var react_router_dom_es_MemoryRouter = (es_MemoryRouter);
 // EXTERNAL MODULE: ./node_modules/path-to-regexp/index.js
-var path_to_regexp = __webpack_require__(7);
+var path_to_regexp = __webpack_require__(8);
 var path_to_regexp_default = /*#__PURE__*/__webpack_require__.n(path_to_regexp);
 
 // CONCATENATED MODULE: ./node_modules/react-router/es/matchPath.js
@@ -2615,7 +2775,7 @@ Switch_Switch.propTypes = {
 
 /* harmony default export */ var react_router_dom_es_matchPath = (es_matchPath);
 // EXTERNAL MODULE: ./node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js
-var hoist_non_react_statics_cjs = __webpack_require__(11);
+var hoist_non_react_statics_cjs = __webpack_require__(12);
 var hoist_non_react_statics_cjs_default = /*#__PURE__*/__webpack_require__.n(hoist_non_react_statics_cjs);
 
 // CONCATENATED MODULE: ./node_modules/react-router/es/withRouter.js
@@ -2705,10 +2865,10 @@ var withRouter_withRouter = function withRouter(Component) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isarray = __webpack_require__(21)
+var isarray = __webpack_require__(22)
 
 /**
  * Expose `pathToRegexp`.
@@ -3137,166 +3297,6 @@ function pathToRegexp (path, keys, options) {
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.fetchCheck = fetchCheck;
-exports.fetchJSON = fetchJSON;
-exports.fetchText = fetchText;
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(0);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var FetchContainer = function (_React$Component) {
-  _inherits(FetchContainer, _React$Component);
-
-  function FetchContainer(props) {
-    _classCallCheck(this, FetchContainer);
-
-    var _this = _possibleConstructorReturn(this, (FetchContainer.__proto__ || Object.getPrototypeOf(FetchContainer)).call(this, props));
-
-    _this.state = {
-      err: null,
-      fetchResults: null
-    };
-    return _this;
-  }
-
-  _createClass(FetchContainer, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.load();
-    }
-  }, {
-    key: 'load',
-    value: function load() {
-      var _this2 = this;
-
-      var fetchKeys = Object.keys(this.props.fetch);
-      Promise.all(fetchKeys.map(function (key) {
-        return Promise.resolve(_this2.props.fetch[key]);
-      })).then(function (values) {
-        var fetchResults = {};
-        fetchKeys.forEach(function (key, i) {
-          return fetchResults[key] = values[i];
-        });
-        _this2.setState({ fetchResults: fetchResults });
-      }).catch(function (err) {
-        _this2.setState({ err: err });
-      });
-    }
-  }, {
-    key: 'renderLoading',
-    value: function renderLoading() {
-      return _react2.default.createElement(
-        'div',
-        { className: 'spinner-grow text-primary', role: 'status' },
-        _react2.default.createElement(
-          'span',
-          { className: 'sr-only' },
-          'Loading...'
-        )
-      );
-    }
-  }, {
-    key: 'renderError',
-    value: function renderError(err) {
-      console.log("Oh sorrow! Error: %o", err);
-      return _react2.default.createElement(
-        'div',
-        { className: 'alert alert-danger' },
-        _react2.default.createElement(
-          'strong',
-          null,
-          'Oh sorrow!'
-        ),
-        ' ',
-        err.toString()
-      );
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      if (this.state.err) {
-        return this.renderError(this.state.err);
-      }
-      if (this.props.wait && !this.state.fetchResults) {
-        return this.renderLoading();
-      }
-      var onlyChild = _react2.default.Children.only(this.props.children);
-      return _react2.default.cloneElement(onlyChild, this.state.fetchResults);
-    }
-  }]);
-
-  return FetchContainer;
-}(_react2.default.Component);
-
-FetchContainer.propTypes = {
-  children: _propTypes2.default.element.isRequired,
-  fetch: _propTypes2.default.object.isRequired,
-  wait: _propTypes2.default.bool
-};
-
-FetchContainer.defaultProps = {
-  wait: true
-};
-
-function fetchCheck(res) {
-  if (res.ok) {
-    return res;
-  } else {
-    return res.text().then(function (text) {
-      throw new Error(text ? text : res.statusText);
-    }, function (err) {
-      throw new Error(res.statusText);
-    }).catch(function (err) {
-      console.error("Error in fetchCheck: %o", err);
-      throw err;
-    });
-  }
-}
-
-function fetchWithCheck(url, init) {
-  return fetch(url, Object.assign({ method: 'get' }, init)).then(fetchCheck);
-}
-
-function fetchJSON(url, init) {
-  return fetchWithCheck(url, init).then(function (res) {
-    return res.json();
-  });
-}
-
-function fetchText(url, init) {
-  return fetchWithCheck(url, init).then(function (res) {
-    return res.text();
-  });
-}
-
-exports.default = FetchContainer;
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3403,6 +3403,41 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.formatAmount = formatAmount;
+exports.formatDateLong = formatDateLong;
+exports.formatDateShort = formatDateShort;
+
+var _unicode = __webpack_require__(5);
+
+function formatAmount(amount) {
+  if (amount == 0) return "-";
+  var s = amount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+  if (s.startsWith("-")) s = "(" + s.substring(1) + ")";
+  return s;
+}
+
+function formatDateLong(date) {
+  var m = moment(date);
+  var s = m.format('ddd, MMM Do, YYYY');
+  var dd = moment().diff(m, 'days');
+  return dd == 0 ? s + " " + _unicode.mdash + " Today" : dd == 1 ? s + " " + _unicode.mdash + " Yesterday" : dd > 1 ? s + " " + _unicode.mdash + " " + dd + " days ago" : s;
+}
+
+function formatDateShort(date) {
+  var m = moment(date);
+  return m.format("D MMM YYYY");
+}
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -3459,7 +3494,7 @@ DocumentTitle.propTypes = {
 exports.default = DocumentTitle;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3534,7 +3569,7 @@ module.exports = hoistNonReactStatics;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3544,13 +3579,13 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactRouterDom = __webpack_require__(6);
+var _reactRouterDom = __webpack_require__(7);
 
-var _App = __webpack_require__(22);
+var _App = __webpack_require__(23);
 
 var _App2 = _interopRequireDefault(_App);
 
@@ -3563,7 +3598,7 @@ _reactDom2.default.render(_react2.default.createElement(
 ), document.getElementById('app'));
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3594,7 +3629,7 @@ unstable_ConcurrentMode:x,unstable_Profiler:u,__SECRET_INTERNALS_DO_NOT_USE_OR_Y
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3623,12 +3658,12 @@ if (true) {
   // DCE check should happen before ReactDOM bundle executes so that
   // DevTools can report bad minification during injection.
   checkDCE();
-  module.exports = __webpack_require__(15);
+  module.exports = __webpack_require__(16);
 } else {}
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3644,7 +3679,7 @@ if (true) {
 /*
  Modernizr 3.0.0pre (Custom Build) | MIT
 */
-var aa=__webpack_require__(1),n=__webpack_require__(9),ba=__webpack_require__(16);function ca(a,b,c,d,e,f,g,h){if(!a){a=void 0;if(void 0===b)a=Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var k=[c,d,e,f,g,h],l=0;a=Error(b.replace(/%s/g,function(){return k[l++]}));a.name="Invariant Violation"}a.framesToPop=1;throw a;}}
+var aa=__webpack_require__(1),n=__webpack_require__(9),ba=__webpack_require__(17);function ca(a,b,c,d,e,f,g,h){if(!a){a=void 0;if(void 0===b)a=Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var k=[c,d,e,f,g,h],l=0;a=Error(b.replace(/%s/g,function(){return k[l++]}));a.name="Invariant Violation"}a.framesToPop=1;throw a;}}
 function t(a){for(var b=arguments.length-1,c="https://reactjs.org/docs/error-decoder.html?invariant="+a,d=0;d<b;d++)c+="&args[]="+encodeURIComponent(arguments[d+1]);ca(!1,"Minified React error #"+a+"; visit %s for the full message or use the non-minified dev environment for full errors and additional helpful warnings. ",c)}aa?void 0:t("227");function da(a,b,c,d,e,f,g,h,k){var l=Array.prototype.slice.call(arguments,3);try{b.apply(c,l)}catch(m){this.onError(m)}}
 var ea=!1,fa=null,ha=!1,ia=null,ja={onError:function(a){ea=!0;fa=a}};function ka(a,b,c,d,e,f,g,h,k){ea=!1;fa=null;da.apply(ja,arguments)}function la(a,b,c,d,e,f,g,h,k){ka.apply(this,arguments);if(ea){if(ea){var l=fa;ea=!1;fa=null}else t("198"),l=void 0;ha||(ha=!0,ia=l)}}var ma=null,na={};
 function oa(){if(ma)for(var a in na){var b=na[a],c=ma.indexOf(a);-1<c?void 0:t("96",a);if(!pa[c]){b.extractEvents?void 0:t("97",a);pa[c]=b;c=b.eventTypes;for(var d in c){var e=void 0;var f=c[d],g=b,h=d;qa.hasOwnProperty(h)?t("99",h):void 0;qa[h]=f;var k=f.phasedRegistrationNames;if(k){for(e in k)k.hasOwnProperty(e)&&ra(k[e],g,h);e=!0}else f.registrationName?(ra(f.registrationName,g,h),e=!0):e=!1;e?void 0:t("98",d,a)}}}}
@@ -3884,19 +3919,19 @@ var li={default:ki},mi=li&&ki||li;module.exports=mi.default||mi;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 if (true) {
-  module.exports = __webpack_require__(17);
+  module.exports = __webpack_require__(18);
 } else {}
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3922,10 +3957,10 @@ exports.unstable_scheduleCallback=function(a,b){var d=-1!==k?k:exports.unstable_
 b=d.previous;b.next=d.previous=a;a.next=d;a.previous=b}return a};exports.unstable_cancelCallback=function(a){var b=a.next;if(null!==b){if(b===a)c=null;else{a===c&&(c=b);var d=a.previous;d.next=b;b.previous=d}a.next=a.previous=null}};exports.unstable_wrapCallback=function(a){var b=h;return function(){var d=h,e=k;h=b;k=exports.unstable_now();try{return a.apply(this,arguments)}finally{h=d,k=e,v()}}};exports.unstable_getCurrentPriorityLevel=function(){return h};
 exports.unstable_shouldYield=function(){return!f&&(null!==c&&c.expirationTime<l||w())};exports.unstable_continueExecution=function(){null!==c&&p()};exports.unstable_pauseExecution=function(){};exports.unstable_getFirstCallbackNode=function(){return c};
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(18)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(19)))
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 var g;
@@ -3951,7 +3986,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3964,7 +3999,7 @@ module.exports = g;
 
 
 
-var ReactPropTypesSecret = __webpack_require__(20);
+var ReactPropTypesSecret = __webpack_require__(21);
 
 function emptyFunction() {}
 
@@ -4017,7 +4052,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4036,7 +4071,7 @@ module.exports = ReactPropTypesSecret;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = Array.isArray || function (arr) {
@@ -4045,7 +4080,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4063,21 +4098,25 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(6);
+var _reactRouterDom = __webpack_require__(7);
 
-var _ErrorBoundary = __webpack_require__(23);
+var _Balances = __webpack_require__(24);
+
+var _Balances2 = _interopRequireDefault(_Balances);
+
+var _ErrorBoundary = __webpack_require__(25);
 
 var _ErrorBoundary2 = _interopRequireDefault(_ErrorBoundary);
 
-var _Postings = __webpack_require__(24);
+var _Postings = __webpack_require__(26);
 
 var _Postings2 = _interopRequireDefault(_Postings);
 
-var _Settings = __webpack_require__(29);
+var _Settings = __webpack_require__(31);
 
 var _Settings2 = _interopRequireDefault(_Settings);
 
-var _Sidebar = __webpack_require__(34);
+var _Sidebar = __webpack_require__(36);
 
 var _Sidebar2 = _interopRequireDefault(_Sidebar);
 
@@ -4196,6 +4235,7 @@ var App = function (_React$Component) {
                   null,
                   _react2.default.createElement(_reactRouterDom.Redirect, { exact: true, from: '/', to: '/postings' }),
                   _react2.default.createElement(_reactRouterDom.Route, { path: '/postings', component: _Postings2.default }),
+                  _react2.default.createElement(_reactRouterDom.Route, { path: '/balances', component: _Balances2.default }),
                   _react2.default.createElement(_reactRouterDom.Route, { path: '/settings', component: _Settings2.default })
                 )
               )
@@ -4212,7 +4252,352 @@ var App = function (_React$Component) {
 exports.default = App;
 
 /***/ }),
-/* 23 */
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _FetchContainer = __webpack_require__(6);
+
+var _FetchContainer2 = _interopRequireDefault(_FetchContainer);
+
+var _formatters = __webpack_require__(10);
+
+var _unicode = __webpack_require__(5);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Balances = function (_React$Component) {
+  _inherits(Balances, _React$Component);
+
+  function Balances() {
+    _classCallCheck(this, Balances);
+
+    return _possibleConstructorReturn(this, (Balances.__proto__ || Object.getPrototypeOf(Balances)).apply(this, arguments));
+  }
+
+  _createClass(Balances, [{
+    key: 'render',
+    value: function render() {
+      var balancesDate = moment().subtract(1, "days").toISOString(true).substring(0, 10);
+      return _react2.default.createElement(
+        'div',
+        { className: 'm-3' },
+        _react2.default.createElement(
+          _FetchContainer2.default,
+          { fetch: {
+              accounts: (0, _FetchContainer.fetchJSON)("api/account"),
+              accountTypes: (0, _FetchContainer.fetchJSON)("api/account-type"),
+              accountBalances: (0, _FetchContainer.fetchJSON)("api/account-balance/summary/" + balancesDate),
+              balancesDate: balancesDate
+            } },
+          _react2.default.createElement(BalancesView, null)
+        )
+      );
+    }
+  }]);
+
+  return Balances;
+}(_react2.default.Component);
+
+var BalancesView = function (_React$Component2) {
+  _inherits(BalancesView, _React$Component2);
+
+  function BalancesView(props) {
+    _classCallCheck(this, BalancesView);
+
+    return _possibleConstructorReturn(this, (BalancesView.__proto__ || Object.getPrototypeOf(BalancesView)).call(this, props));
+  }
+
+  _createClass(BalancesView, [{
+    key: 'renderListGroup',
+    value: function renderListGroup(accountTypeCode) {
+      var _this3 = this;
+
+      var accountType = this.props.accountTypes.find(function (at) {
+        return at.accountTypeCode === accountTypeCode;
+      });
+      if (!accountType) return;
+      var accounts = this.props.accounts.filter(function (account) {
+        return account.accountTypeId === accountType.accountTypeId;
+      });
+      return _react2.default.createElement(
+        'div',
+        { className: 'card d-inline-flex mb-4 mr-4', key: accountType.accountTypeId },
+        _react2.default.createElement(
+          'div',
+          { className: 'card-header' },
+          _react2.default.createElement(
+            'div',
+            { className: 'd-flex w-100 justify-content-between' },
+            _react2.default.createElement(
+              'div',
+              null,
+              accountType.accountTypeCode + " - " + accountType.accountTypeName
+            ),
+            _react2.default.createElement(
+              'div',
+              null,
+              _react2.default.createElement(
+                'small',
+                null,
+                accounts.length,
+                ' account',
+                accounts.length == 1 ? "" : "s"
+              )
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'ul',
+          { className: 'list-group list-group-flush' },
+          accounts.filter(function (account) {
+            return !account.parentAccountId;
+          }).map(function (account) {
+            return _this3.renderListGroupItem(account);
+          })
+        )
+      );
+    }
+  }, {
+    key: 'renderListGroupItem',
+    value: function renderListGroupItem(account) {
+      var _this4 = this;
+
+      var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+      var accountType = this.props.accountTypes.find(function (at) {
+        return at.accountTypeId === account.accountTypeId;
+      });
+      var balances = this.props.accountBalances.filter(function (ab) {
+        return ab.accountId === account.accountId;
+      }).filter(function (ab) {
+        return ab.postingDate <= _this4.props.balancesDate;
+      });
+      var balancePrev = balances.length > 1 && balances[0].reconciled === "Y" && balances[0];
+      var balanceCurr = balances.length > 0 && balances[balances.length - 1];
+      var balanceNext = balanceCurr && balanceCurr.postingDate < this.props.balancesDate && Object.assign({}, ["accountId", "currencyId", "postingCount", "amount"].reduce(function (a, key) {
+        a[key] = balanceCurr[key];return a;
+      }, {}), { postingDate: this.props.balancesDate, reconciled: "N" });
+      return _react2.default.createElement(
+        _react2.default.Fragment,
+        { key: account.accountId },
+        _react2.default.createElement(
+          'li',
+          { className: 'list-group-item py-2', key: account.accountId },
+          _react2.default.createElement(
+            'div',
+            { style: { marginLeft: depth + "em" } },
+            _react2.default.createElement(
+              'div',
+              { className: balancePrev && balancePrev.amount || balanceCurr && balanceCurr.amount ? "font-weight-bold" : "" },
+              account.accountCode + " - " + account.accountName
+            ),
+            _react2.default.createElement(BalanceRow, {
+              accountBalance: balancePrev,
+              sign: accountType.sign
+            }),
+            _react2.default.createElement(BalanceRow, {
+              accountBalance: balanceCurr,
+              sign: accountType.sign,
+              balancePrev: balancePrev,
+              accountBalances: this.props.accountBalances
+            }),
+            _react2.default.createElement(BalanceRow, {
+              accountBalance: balanceNext,
+              sign: accountType.sign
+            })
+          )
+        ),
+        this.props.accounts.filter(function (a2) {
+          return a2.parentAccountId == account.accountId;
+        }).map(function (a2) {
+          return _this4.renderListGroupItem(a2, depth + 1);
+        })
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        this.renderListGroup("A"),
+        this.renderListGroup("L"),
+        _react2.default.createElement(
+          'p',
+          null,
+          this.props.accountTypes.map(function (accountType) {
+            return _react2.default.createElement(
+              'div',
+              null,
+              JSON.stringify(accountType)
+            );
+          })
+        ),
+        _react2.default.createElement(
+          'p',
+          null,
+          JSON.stringify(this.props.accountBalances)
+        ),
+        _react2.default.createElement(
+          'p',
+          null,
+          JSON.stringify(this.props.accounts)
+        )
+      );
+    }
+  }]);
+
+  return BalancesView;
+}(_react2.default.Component);
+
+var BalanceRow = function (_React$Component3) {
+  _inherits(BalanceRow, _React$Component3);
+
+  function BalanceRow(props) {
+    _classCallCheck(this, BalanceRow);
+
+    var _this5 = _possibleConstructorReturn(this, (BalanceRow.__proto__ || Object.getPrototypeOf(BalanceRow)).call(this, props));
+
+    _this5.state = {
+      loading: false,
+      error: null
+    };
+    _this5.handleReconcile = _this5.handleReconcile.bind(_this5);
+    return _this5;
+  }
+
+  _createClass(BalanceRow, [{
+    key: 'handleReconcile',
+    value: function handleReconcile(e) {
+      var _this6 = this;
+
+      e.preventDefault();
+      this.setState({ loading: true });
+
+      var accountBalance = Object.assign({}, this.props.accountBalance, { reconciled: "Y" });
+      (0, _FetchContainer.fetchText)("api/account-balance/reconcile", {
+        method: "POST",
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(accountBalance)
+      }).then(function () {
+        _this6.props.accountBalance.reconciled = "Y";
+        _this6.setState({ loading: false });
+      }).catch(function (err) {
+        _this6.setState({ loading: false, error: err });
+      });
+    }
+  }, {
+    key: 'renderCheckbox',
+    value: function renderCheckbox() {
+      if (this.state.loading) {
+        return _react2.default.createElement(
+          'span',
+          { className: 'oasisledger-balances__row__checkbox oasisledger-balances__row__checkbox--loading' },
+          _react2.default.createElement('i', { className: 'fa fa-spinner fa-pulse fa-fw', 'aria-hidden': 'true' })
+        );
+      } else if (this.state.error) {
+        return _react2.default.createElement(
+          'span',
+          { className: 'oasisledger-balances__row__checkbox text-danger' },
+          _react2.default.createElement('i', { className: 'fa fa-exclamation-triangle fa-fw', 'aria-hidden': 'true' })
+        );
+      } else if (this.props.accountBalance.reconciled === "Y") {
+        return _react2.default.createElement(
+          'span',
+          { className: 'oasisledger-balances__row__checkbox text-success' },
+          _react2.default.createElement('i', { className: 'fa fa-check fa-fw', 'aria-hidden': 'true' })
+        );
+      } else {
+        return _react2.default.createElement(
+          'a',
+          { href: '#',
+            onClick: this.handleReconcile,
+            className: 'oasisledger-balances__row__checkbox'
+          },
+          _react2.default.createElement('i', { className: 'fa fa-check fa-fw', 'aria-hidden': 'true' })
+        );
+      }
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          accountBalance = _props.accountBalance,
+          sign = _props.sign,
+          balancePrev = _props.balancePrev;
+
+      if (!accountBalance) return null;
+      var postingCount = balancePrev && d3.sum(this.props.accountBalances.filter(function (ab) {
+        return ab.accountId === accountBalance.accountId && ab.postingDate > balancePrev.postingDate && ab.postingDate <= accountBalance.postingDate;
+      }), function (ab) {
+        return ab.postingCount;
+      });
+      return _react2.default.createElement(
+        'div',
+        { className: 'row oasisledger-balances__row', style: { marginLeft: "1em" } },
+        _react2.default.createElement(
+          'div',
+          { className: 'col' },
+          (0, _formatters.formatDateLong)(accountBalance.postingDate),
+          Number.isInteger(postingCount) && _react2.default.createElement(
+            'span',
+            null,
+            ' ',
+            _unicode.mdash,
+            ' ',
+            _react2.default.createElement(
+              'span',
+              { className: 'text-primary' },
+              postingCount,
+              ' new posting',
+              postingCount > 1 && "s"
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'col-auto' },
+          _react2.default.createElement(
+            'span',
+            { className: accountBalance.amount * sign < 0 ? " text-danger" : "" },
+            (0, _formatters.formatAmount)(accountBalance.amount * sign)
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'col-auto pl-0' },
+          this.renderCheckbox()
+        )
+      );
+    }
+  }]);
+
+  return BalanceRow;
+}(_react2.default.Component);
+
+exports.default = Balances;
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4286,7 +4671,7 @@ var ErrorBoundary = function (_React$Component) {
 exports.default = ErrorBoundary;
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4304,17 +4689,21 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _FetchContainer = __webpack_require__(8);
+var _reactRouterDom = __webpack_require__(7);
+
+var _FetchContainer = __webpack_require__(6);
 
 var _FetchContainer2 = _interopRequireDefault(_FetchContainer);
 
-var _formatters = __webpack_require__(25);
+var _formatters = __webpack_require__(10);
 
-var _unicode = __webpack_require__(5);
-
-var _Post = __webpack_require__(26);
+var _Post = __webpack_require__(27);
 
 var _Post2 = _interopRequireDefault(_Post);
+
+var _Upload = __webpack_require__(30);
+
+var _Upload2 = _interopRequireDefault(_Upload);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4326,9 +4715,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } //TODO: move from .. to .
+
 
 var Postings = function Postings() {
+  return _react2.default.createElement(
+    _react2.default.Fragment,
+    null,
+    _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/postings', component: PostingsIndex }),
+    _react2.default.createElement(_reactRouterDom.Route, { path: '/postings/upload', component: _Upload2.default })
+  );
+};
+
+var PostingsIndex = function PostingsIndex() {
   return _react2.default.createElement(
     'div',
     { className: 'm-3' },
@@ -4604,17 +5003,13 @@ var PostingsListingResults = function (_React$Component2) {
     value: function renderPostingsGroup(postingDate, postingsGroup) {
       var _this3 = this;
 
-      var m = moment(postingDate);
-      var postingDateText = m.format('ddd, MMM Do, YYYY') + function (dd) {
-        return dd == 0 ? " " + _unicode.mdash + " Today" : dd == 1 ? " " + _unicode.mdash + " Yesterday" : dd > 1 ? " " + _unicode.mdash + " " + dd + " days ago" : "";
-      }(moment().diff(m, 'days'));
       return _react2.default.createElement(
         _react2.default.Fragment,
         null,
         _react2.default.createElement(
           'h6',
           { className: 'mt-4' },
-          postingDateText
+          (0, _formatters.formatDateLong)(postingDate)
         ),
         _react2.default.createElement(
           'div',
@@ -4629,7 +5024,7 @@ var PostingsListingResults = function (_React$Component2) {
                 _react2.default.createElement(
                   'div',
                   { className: 'col-sm-auto oasisledger-postings-listing__date' },
-                  (0, _formatters.formatDate)(posting.postingDate)
+                  (0, _formatters.formatDateShort)(posting.postingDate)
                 ),
                 _react2.default.createElement(
                   'div',
@@ -4776,35 +5171,7 @@ var PostingsListingResults = function (_React$Component2) {
 exports.default = Postings;
 
 /***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.formatAmount = formatAmount;
-exports.formatDate = formatDate;
-var DEFAULT_DATE_FORMAT = "D MMM YYYY";
-
-function formatAmount(amount) {
-  if (amount == 0) return "-";
-  var s = amount.toLocaleString('en-US', { minimumFractionDigits: 2 });
-  if (s.startsWith("-")) s = "(" + s.substring(1) + ")";
-  return s;
-}
-
-function formatDate(date) {
-  var fmt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULT_DATE_FORMAT;
-
-  var m = moment(date);
-  return m.format(fmt);
-}
-
-/***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4820,15 +5187,15 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _AccountInput = __webpack_require__(27);
+var _AccountInput = __webpack_require__(28);
 
 var _AccountInput2 = _interopRequireDefault(_AccountInput);
 
-var _DatePicker = __webpack_require__(28);
+var _DatePicker = __webpack_require__(29);
 
 var _DatePicker2 = _interopRequireDefault(_DatePicker);
 
-var _FetchContainer = __webpack_require__(8);
+var _FetchContainer = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5189,7 +5556,7 @@ var Post = function (_React$Component) {
 exports.default = Post;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5575,7 +5942,7 @@ AccountInput.propTypes = {
 exports.default = AccountInput;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5869,7 +6236,42 @@ DatePicker.propTypes = {
 exports.default = DatePicker;
 
 /***/ }),
-/* 29 */
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = Upload;
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function Upload() {
+  return _react2.default.createElement(
+    "div",
+    { className: "m-3" },
+    _react2.default.createElement(
+      "div",
+      { className: "custom-file" },
+      _react2.default.createElement("input", { type: "file", className: "custom-file-input", id: "customFile" }),
+      _react2.default.createElement(
+        "label",
+        { className: "custom-file-label", htmlFor: "customFile" },
+        "Choose file"
+      )
+    )
+  );
+}
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5883,13 +6285,13 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(6);
+var _reactRouterDom = __webpack_require__(7);
 
-var _Accounts = __webpack_require__(30);
+var _Accounts = __webpack_require__(32);
 
 var _Accounts2 = _interopRequireDefault(_Accounts);
 
-var _Users = __webpack_require__(33);
+var _Users = __webpack_require__(35);
 
 var _Users2 = _interopRequireDefault(_Users);
 
@@ -5937,7 +6339,7 @@ var SettingsIndex = function SettingsIndex() {
 exports.default = Settings;
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5955,19 +6357,19 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _AccountSelect = __webpack_require__(31);
+var _AccountSelect = __webpack_require__(33);
 
 var _AccountSelect2 = _interopRequireDefault(_AccountSelect);
 
-var _AccountTypeSelect = __webpack_require__(32);
+var _AccountTypeSelect = __webpack_require__(34);
 
 var _AccountTypeSelect2 = _interopRequireDefault(_AccountTypeSelect);
 
-var _DocumentTitle = __webpack_require__(10);
+var _DocumentTitle = __webpack_require__(11);
 
 var _DocumentTitle2 = _interopRequireDefault(_DocumentTitle);
 
-var _FetchContainer = __webpack_require__(8);
+var _FetchContainer = __webpack_require__(6);
 
 var _FetchContainer2 = _interopRequireDefault(_FetchContainer);
 
@@ -6471,7 +6873,7 @@ var AccountCreateModal = function (_React$Component2) {
 exports.default = Accounts;
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6584,7 +6986,7 @@ AccountSelect.propTypes = {
 exports.default = AccountSelect;
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6633,7 +7035,7 @@ var AccountTypeSelect = function AccountTypeSelect(_ref) {
 exports.default = AccountTypeSelect;
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6649,7 +7051,7 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _DocumentTitle = __webpack_require__(10);
+var _DocumentTitle = __webpack_require__(11);
 
 var _DocumentTitle2 = _interopRequireDefault(_DocumentTitle);
 
@@ -6691,7 +7093,7 @@ var Users = function (_React$Component) {
 exports.default = Users;
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6707,7 +7109,7 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = __webpack_require__(6);
+var _reactRouterDom = __webpack_require__(7);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6809,7 +7211,8 @@ var Sidebar = function (_React$Component) {
               _react2.default.createElement(
                 'ul',
                 { className: 'nav flex-column' },
-                this.renderNavItem("/postings", "Postings")
+                this.renderNavItem("/postings", "Postings"),
+                this.renderNavItem("/balances", "Balances")
               )
             )
           ),

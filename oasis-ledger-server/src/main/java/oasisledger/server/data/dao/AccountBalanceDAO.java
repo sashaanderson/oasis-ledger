@@ -17,14 +17,14 @@ public interface AccountBalanceDAO {
             + "    from account_balance "
             + "    where account_id = :accountId "
             + "    and currency_id = :currencyId "
-            + "    and posting_date < :postingDate)), 0)"
+            + "    and posting_date < :postingDate)), 0) "
             + "where not exists ("
             + "  select 1 from account_balance "
             + "  where account_id = :accountId "
             + "  and currency_id = :currencyId "
             + "  and posting_date = :postingDate "
             + ")")
-    void insertDate(@Bind("accountId") int accountId,
+    void addBalanceIfNotExists(@Bind("accountId") int accountId,
                     @Bind("currencyId") int currencyId,
                     @Bind("postingDate") LocalDate postingDate);
 
@@ -35,9 +35,18 @@ public interface AccountBalanceDAO {
             + "where account_id = :accountId "
             + "and currency_id = :currencyId "
             + "and posting_date >= :postingDate")
-    void updateAmount(@Bind("accountId") int accountId,
+    void addPosting(@Bind("accountId") int accountId,
                       @Bind("currencyId") int currencyId,
                       @Bind("postingDate") LocalDate postingDate,
                       @Bind("rawAmount") long rawAmount);
+
+    @SqlUpdate("update account_balance "
+            + "set reconciled = 'Y' "
+            + "where account_id = :accountId "
+            + "and currency_id = :currencyId "
+            + "and posting_date = :postingDate")
+    void reconcile(@Bind("accountId") int accountId,
+                   @Bind("currencyId") int currencyId,
+                   @Bind("postingDate") LocalDate postingDate);
 
 }

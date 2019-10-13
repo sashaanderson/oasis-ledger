@@ -60,6 +60,7 @@ class Sidebar extends React.Component {
             <nav className="oasisledger-sidebar__nav">
               <ul className="nav flex-column">
                 {this.renderNavItem("/postings", "Postings")}
+                {this.renderNavItem("/balances", "Balances")}
               </ul>
             </nav>
           </div>

@@ -210,3 +210,14 @@ body {
     margin-left: 1em;
   }
 }
+
+
+.oasisledger-balances__row__checkbox {
+  color: transparent;
+}
+.oasisledger-balances__row:hover .oasisledger-balances__row__checkbox {
+  color: var(--secondary);
+}
+.oasisledger-balances__row__checkbox--loading {
+  color: inherit;
+}
