@@ -7,6 +7,11 @@ bootstrap-4.2.1
       https://code.jquery.com/jquery-3.3.1.slim.min.js
 
 
+bs-custom-file-input-1.3.2
+  https://github.com/Johann-S/bs-custom-file-input
+  https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js
+
+
 font-awesome-4.7.0
   https://fontawesome.com/v4.7.0/
 
