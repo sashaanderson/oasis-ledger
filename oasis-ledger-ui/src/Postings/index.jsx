@@ -1,11 +1,20 @@
 import React from 'react';
+import { Route } from 'react-router-dom';
 
 import FetchContainer, { fetchJSON } from 'util/FetchContainer';
 import { formatAmount, formatDateShort, formatDateLong } from 'util/formatters';
 
-import Post from './Post';
+import Post from '../Post'; //TODO: move from .. to .
+import Upload from './Upload';
 
 const Postings = () => (
+  <React.Fragment>
+    <Route exact path="/postings" component={PostingsIndex}/>
+    <Route path="/postings/upload" component={Upload}/>
+  </React.Fragment>
+);
+
+const PostingsIndex = () => (
   <div className="m-3">
     <div className="row">
       <div className="col-md mb-3">zzz</div>
