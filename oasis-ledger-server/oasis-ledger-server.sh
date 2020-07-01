@@ -6,8 +6,14 @@ else
     args="$@"
 fi
 
-if [ -e target/classes/ ]; then
-    java -cp "target/classes;target/lib/*" oasisledger.server.App $args
+if [ -n "$JAVA_HOME" ]; then
+    JAVACMD="$JAVA_HOME/bin/java"
 else
-    java -jar oasis-ledger-server-*.jar $args
+    JAVACMD=java
+fi
+
+if [ -e target/classes/ ]; then
+    exec "$JAVACMD" -cp "target/classes;target/lib/*" oasisledger.server.App $args
+else
+    exec "$JAVACMD" -jar oasis-ledger-server-*.jar $args
 fi
