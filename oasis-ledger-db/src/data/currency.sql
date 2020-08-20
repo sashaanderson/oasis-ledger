@@ -20,3 +20,6 @@ VALUES
   (18, 'INR', 'Indian rupee', 2),
   (19, 'BRL', 'Brazilian real', 2),
   (20, 'ZAR', 'South African rand', 2);
+
+-- Source:
+-- https://en.wikipedia.org/wiki/Template:Most_traded_currencies
