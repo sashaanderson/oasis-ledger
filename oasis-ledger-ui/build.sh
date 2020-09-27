@@ -17,7 +17,9 @@ sync() {
 sync &
 sync=$!
 
-node node_modules/webpack/bin/webpack.js -w --progress
+set -x
+node node_modules/webpack/bin/webpack.js -w --progress --mode=development
+set +x
 
 kill $sync >/dev/null 2>&1
 cmd /c pause
