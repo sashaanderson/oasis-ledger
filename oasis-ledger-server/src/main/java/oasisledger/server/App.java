@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -25,6 +26,7 @@ public class App extends Application<AppConfig> {
     @Override
     public void initialize(final Bootstrap<AppConfig> bootstrap) {
         bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html", "assets"));
+        bootstrap.addBundle(new MultiPartBundle());
     }
 
     @Override

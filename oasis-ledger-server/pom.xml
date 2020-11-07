@@ -49,6 +49,10 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-forms</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jdbi3</artifactId>
     </dependency>
 
@@ -73,6 +77,11 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
+      <version>3.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-json</artifactId>
       <version>3.0.4</version>
     </dependency>
 
