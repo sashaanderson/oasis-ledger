@@ -16,7 +16,7 @@ class Post extends React.Component {
       inputCurrency: "CAD",
     };
     this.state = {
-      resetCount: 0,
+      stateKey: 0,
       input: this.defaultInput,
       valid: null,
       running: false,
@@ -41,7 +41,7 @@ class Post extends React.Component {
 
   handleClear() {
     this.setState(prevState => ({
-      resetCount: prevState.resetCount + 1,
+      stateKey: prevState.stateKey + 1,
       input: this.defaultInput,
       valid: null,
       message: null,
@@ -115,7 +115,7 @@ class Post extends React.Component {
         <div className="form-row">
           <div className="col-auto mb-2">
             <DatePicker
-              key={this.state.resetCount}
+              key={this.state.stateKey}
               onChange={this.setInput.bind(this, "inputDate")}
               value={this.getInput("inputDate")}
              ><input
@@ -162,13 +162,13 @@ class Post extends React.Component {
             <div className="input-group">
               <div className="input-group-prepend">
                 <span className="input-group-text">
-                  From:
+                  <span className="text-left" style={{minWidth: "3em"}}>From:</span>
                 </span>
               </div>
               <AccountInput
                 accountTypes={this.props.accountTypes}
                 accounts={this.props.accounts}
-                key={this.state.resetCount}
+                key={this.state.stateKey}
                 onChange={this.setInput.bind(this, "inputAccountFrom")}
                ><input
                   className={"form-control" + (this.state.valid
@@ -187,13 +187,13 @@ class Post extends React.Component {
             <div className="input-group">
               <div className="input-group-prepend">
                 <span className="input-group-text">
-                  To:
+                  <span className="text-left" style={{minWidth: "3em"}}>To:</span>
                 </span>
               </div>
               <AccountInput
                 accountTypes={this.props.accountTypes}
                 accounts={this.props.accounts}
-                key={this.state.resetCount}
+                key={this.state.stateKey}
                 onChange={this.setInput.bind(this, "inputAccountTo")}
                ><input
                   className={"form-control" + (this.state.valid
@@ -211,7 +211,7 @@ class Post extends React.Component {
           <input
             className="form-control"
             id="inputDescription"
-            placeholder="Description"
+            placeholder="Description..."
             onChange={this.handleChange}
             value={this.getInput("inputDescription")}
            />
