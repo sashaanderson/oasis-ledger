@@ -15,4 +15,11 @@ public interface InstitutionLinkDAO {
     @RegisterRowMapper(MapMapper.class)
     List<Map<String, Object>> findAll();
 
+    @SqlQuery("select account_id, institution_id, reference "
+            + "from institution_link "
+            + "where institution_id = ? "
+            + "order by account_id, institution_id")
+    @RegisterRowMapper(MapMapper.class)
+    List<Map<String, Object>> findByInstitutionId(int institutionId);
+
 }

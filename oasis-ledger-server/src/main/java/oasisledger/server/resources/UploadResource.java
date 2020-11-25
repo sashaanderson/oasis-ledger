@@ -7,7 +7,10 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
+import oasisledger.server.data.dao.AccountDAO;
 import oasisledger.server.data.dao.InstitutionDAO;
+import oasisledger.server.data.dao.InstitutionLinkDAO;
+import oasisledger.server.data.dto.AccountDTO;
 import oasisledger.server.data.dto.InstitutionDTO;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -67,16 +70,8 @@ public class UploadResource {
                 + ", institution=" + institutionId
                 + ", accountId=" + accountId);
 
-        InstitutionDTO institution = jdbi.withExtension(InstitutionDAO.class, dao ->
-                dao.findById(institutionId)
-        );
-
-        String institutionCode = institution.getInstitutionCode();
-        if (!institutionCode.matches("^[a-z0-9]+$"))
-            throw new IllegalStateException("Invalid institution code, expected lowercase alphanumeric, got: " + institutionCode);
-
-        String scriptName = institutionCode + ".groovy";
-        String[] args = { Integer.toString(accountId) };
+        String scriptName = getScriptName(institutionId);
+        String[] args = getArgs(institutionId, accountId);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -84,6 +79,7 @@ public class UploadResource {
         binding.setVariable("args", args);
         binding.setVariable("stdin", fileStream);
         binding.setVariable("stdout", new PrintStream(baos));
+
         gse.run(scriptName, binding);
         //TODO - try-catch around .run, simple error message on exception but log full exception
 
@@ -94,6 +90,46 @@ public class UploadResource {
         }
 
         return result;
+    }
+
+    private String getScriptName(int institutionId) {
+        InstitutionDTO institution = jdbi.withExtension(InstitutionDAO.class, dao ->
+                dao.findById(institutionId)
+        );
+        if (institution == null)
+            throw new IllegalArgumentException("Invalid institution id " + institutionId);
+
+        String institutionCode = institution.getInstitutionCode();
+        if (!institutionCode.matches("^[a-z0-9]+$"))
+            throw new IllegalStateException("Invalid institution code, expected lowercase alphanumeric, got: " + institutionCode);
+
+        return institutionCode + ".groovy";
+    }
+
+    private String[] getArgs(int institutionId, int accountId) {
+        String[] args;
+        if (accountId != 0) {
+            AccountDTO account = jdbi.withExtension(AccountDAO.class, dao ->
+                    dao.findById(accountId)
+            );
+            if (account == null)
+                throw new IllegalArgumentException("Invalid account id " + accountId);
+            args = new String[] { Integer.toString(accountId) };
+        } else { // accountId == 0
+            List<Map<String, Object>> links = jdbi.withExtension(InstitutionLinkDAO.class, dao ->
+                    dao.findByInstitutionId(institutionId)
+            );
+            if (links.isEmpty())
+                throw new IllegalArgumentException("Can't find any institution links for institution id " + institutionId);
+            args = new String[links.size()];
+            for (int i = 0; i < args.length; i++) {
+                args[i] = links.get(i).get("account_id").toString();
+                String reference = links.get(i).get("reference").toString();
+                if (reference != null && !reference.isBlank())
+                    args[i] += (":" + reference);
+            }
+        }
+        return args;
     }
 
 }

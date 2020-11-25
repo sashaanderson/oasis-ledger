@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ public class PostingRepo {
                 c = jdbi.withExtension(CurrencyDAO.class, dao -> dao.findById(pd.getCurrencyId()));
                 if (c == null)
                     throw new IllegalArgumentException("Invalid currencyId: " + pd.getCurrencyId());
+                pd.setCurrency(c.getCurrencyCode());
             }
 
             BigDecimal rawAmount = pd.getAmount().movePointRight(c.getScale());
@@ -83,24 +85,62 @@ public class PostingRepo {
             throw new IllegalArgumentException("Accounts must be unique within a single posting");
         }
 
+        ph.getDetails().forEach(pd -> {
+            if (pd.getStatement() != null) {
+                if (pd.getStatementId() != null)
+                    throw new IllegalArgumentException("Statement to be posted must be without id");
+
+                StatementDTO s = pd.getStatement();
+
+                if (Math.abs(ChronoUnit.DAYS.between(ph.getPostingDate(), s.getStatementDate())) > 5)
+                    throw new IllegalArgumentException("Statement and posting date too far apart");
+
+                if (s.getAccountId() == 0)
+                    s.setAccountId(pd.getAccountId());
+                else if (s.getAccountId() != pd.getAccountId())
+                    throw new IllegalArgumentException("Statement and posting accounts must be same");
+
+                if (s.getCurrency() != null && !s.getCurrency().equals(pd.getCurrency()))
+                    throw new IllegalArgumentException("Statement and posting currency must be same");
+                if (s.getCurrencyId() == 0)
+                    s.setCurrencyId(pd.getCurrencyId());
+                else if (s.getCurrencyId() != pd.getCurrencyId())
+                    throw new IllegalArgumentException("Statement and posting currency id must be same");
+
+                if (!s.getAmount().equals(pd.getAmount()))
+                    throw new IllegalArgumentException("Statement and posting amount must be same");
+
+                s.setDescription(s.getDescription() == null ? "" : s.getDescription().trim());
+                s.setPosted('Y');
+            }
+        });
+
         jdbi.useTransaction(TransactionIsolationLevel.SERIALIZABLE, h -> {
             failIfAccountBalanceIsClosed(ph, h);
 
             PostingDAO pdao = h.attach(PostingDAO.class);
+            StatementDAO sdao = h.attach(StatementDAO.class);
             SysSequenceDAO seq = h.attach(SysSequenceDAO.class);
+
             long phid = seq.getPostingId();
             ph.setPostingHeaderId(phid);
             pdao.insertPostingHeader(ph);
+
             ph.getDetails().forEach(pd -> {
+                if (pd.getStatement() != null) {
+                    StatementDTO s = pd.getStatement();
+                    long sid = seq.getStatementId();
+                    s.setStatementId(sid);
+                    sdao.insert(s);
+                    pd.setStatementId(sid);
+                }
+
                 long pdid = seq.getPostingId();
                 pd.setPostingDetailId(pdid);
                 pd.setPostingHeaderId(phid);
                 pdao.insertPostingDetail(pd);
-            });
 
-            StatementDAO sdao = h.attach(StatementDAO.class);
-            ph.getDetails().forEach(pd -> {
-                if (pd.getStatementId() != null) {
+                if (pd.getStatement() == null && pd.getStatementId() != null) {
                     if (!sdao.setPosted(pd.getStatementId(), pd.getAccountId(), pd.getCurrencyId())) {
                         throw new BadRequestException("Failed to link posting detail to statement id "
                                 + pd.getStatementId());

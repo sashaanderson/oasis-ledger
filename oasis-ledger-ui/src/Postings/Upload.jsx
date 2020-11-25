@@ -1,22 +1,25 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 import AccountInput from 'util/AccountInput';
+import DocumentTitle from 'util/DocumentTitle';
 import FetchContainer, { fetchJSON } from 'util/FetchContainer';
 import { mdash } from 'util/unicode'
 import { formatAmount, formatDateLong, formatDateShort } from 'util/formatters';
 
 export default function Upload() {
   return (
-    <div className="m-3">
-      <FetchContainer wait={false} fetch={{
-        accountTypes: fetchJSON("api/account-type"),
-        accounts: fetchJSON("api/account"),
-        institutions: fetchJSON("api/institution"),
-        institutionLinks: fetchJSON("api/institution/link"),
-      }}>
-        <Upload1/>
-      </FetchContainer>
-    </div>
+    <DocumentTitle title="Upload">
+      <div className="m-3">
+        <FetchContainer wait={false} fetch={{
+          accountTypes: fetchJSON("api/account-type"),
+          accounts: fetchJSON("api/account"),
+          institutions: fetchJSON("api/institution"),
+          institutionLinks: fetchJSON("api/institution/link"),
+        }}>
+          <Upload1/>
+        </FetchContainer>
+      </div>
+    </DocumentTitle>
   );
 }
 
@@ -32,6 +35,7 @@ function Upload1({ accountTypes, accounts, institutions, institutionLinks }) {
     bsCustomFileInput.init();
   });
 
+  /*
   //XXX
   const statements = [{"statementDate":"2020-09-11","accountId":33,"amount":-79.09,"description":"CDN TIRE STORE #00152 (Merchandise)","key":1},{"statementDate":"2020-09-10","accountId":33,"amount":-36.83,"description":"COSTCO GAS W1169 (Gas/Automotive)","key":2},{"statementDate":"2020-09-09","accountId":33,"amount":47.74,"description":"Amazon.ca*MU9W821T0 (Internet)","key":3},{"statementDate":"2020-09-07","accountId":33,"amount":-37.3,"description":"LCBO/RAO #0398 (Merchandise)","key":4},{"statementDate":"2020-09-07","accountId":33,"amount":-147.55,"description":"NOFRILLS MARCS 758 (Merchandise)","key":5},{"statementDate":"2020-09-07","accountId":33,"amount":-42.94,"description":"PARAMOUNT BUTCHER SHOP (Merchandise)","key":6}]
   if (accounts && statements) {
@@ -49,6 +53,7 @@ function Upload1({ accountTypes, accounts, institutions, institutionLinks }) {
       />
     );
   }
+  */
 
   if (state.statements) {
     return (
@@ -290,50 +295,10 @@ function Upload2({ accountTypes, accounts, statements }) {
 
   return (
     <div>
-
-      <div className="mb-5">
-        <h6 className="mt-4">Fri, Sep 4th, 2020 -- 25 days ago</h6>
-        <div className="list-group mb-2">
-          <div className="list-group-item"><div className="row"><div className="col-sm-auto oasisledger-postings-listing__date">4 Sep 2020</div><div className="col-sm font-weight-bold mb-1">Amazon.ca*MU1BE8LL0</div></div><div className="row"><div className="col-sm-auto oasisledger-postings-listing__amount">15.12</div><div className="col-sm text-nowrap">Household</div><div className="col-sm-auto text-nowrap"></div><div className="col-md"><div className="row"><div className="col-sm-auto d-block d-md-none" style={{minWidth: "9em"}}></div><div className="col-sm oasisledger-postings-listing__statement"></div></div></div></div><div className="row"><div className="col-sm-auto text-nowrap"></div><div className="col-sm-auto text-danger oasisledger-postings-listing__amount">(15.12)</div><div className="col-sm text-nowrap">CapitalOne Costco MasterCard</div><div className="col-md"><div className="row"><div className="col-sm-auto d-block d-md-none"></div><div className="col-sm-auto d-block d-md-none" style={{minWidth: "9em"}}></div><div className="col-sm oasisledger-postings-listing__statement">Amazon.ca*MU1BE8LL0</div></div></div></div></div>
-          <div className="list-group-item">
-            <div className="row">
-              <div className="col-sm-auto oasisledger-postings-listing__date">4 Sep 2020</div>
-              <div className="col-sm font-weight-bold mb-1">HYDRO BILL PAYMENT TORONTO HYDRO</div>
-            </div>
-            <div className="row">
-              <div className="col-sm-auto oasisledger-postings-listing__amount">85.31</div>
-              <div className="col-sm text-nowrap">Household</div>
-              <div className="col-sm-auto text-nowrap"></div>
-              <div className="col-md">
-                <div className="row">
-                  <div className="col-sm-auto d-block d-md-none" style={{minWidth: "9em"}}></div>
-                  <div className="col-sm oasisledger-postings-listing__statement"></div>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-sm-auto text-nowrap"></div>
-              <div className="col-sm-auto text-danger oasisledger-postings-listing__amount">(85.31)</div>
-              <div className="col-sm text-nowrap">Simplii No Fee (preauthorized)</div>
-              <div className="col-md">
-                <div className="row">
-                  <div className="col-sm-auto d-block d-md-none"></div>
-                  <div className="col-sm-auto d-block d-md-none" style={{minWidth: "9em"}}></div>
-                  <div className="col-sm oasisledger-postings-listing__statement">HYDRO BILL PAYMENT TORONTO HYDRO</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <hr className="my-5"/>
-
       <p className="text-muted">
         Total of {statements.length} {statements.length == 1 ? "entry" : "entries"} to be posted
         for {statementAccountIds.length} account{statementAccountIds.length == 1 ? "" : "s"}.
       </p>
-
       {statementAccountIds.map(accountId => (
         <Upload21
           accountTypes={accountTypes}
@@ -411,11 +376,58 @@ function Upload22({ accountTypes, accounts, statement }) {
       }));
       return;
     }
+
+    const postingDTO = {
+      postingDate: statement.statementDate,
+      description: state.input.description,
+      details: [
+        {
+          accountId: statement.accountId,
+          currencyId: 6, //TODO
+          amount: statement.amount,
+          statement: {
+            statementDate: statement.statementDate,
+            accountId: statement.accountId,
+            currencyId: 6, //TODO
+            amount: statement.amount,
+            description: statement.description,
+          }
+        }, {
+          accountId: state.input.account,
+          currencyId: 6, //TODO
+          amount: -statement.amount,
+        }
+      ],
+    };
+
     setState(Object.assign({}, state, {
       submitting: true,
       err: null,
     }));
     //fetch, setState(submitting: false, message: ...)
+
+    fetchJSON('api/posting', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(postingDTO)
+    }).then(posting => {
+      setState(Object.assign({}, state, {
+        submitting: false,
+        submitted: true,
+        err: null,
+        message: "Posted successfully: #" + posting.postingHeaderId,
+      }));
+    }).catch(err => {
+      setState(Object.assign({}, state, {
+        submitting: false,
+        submitted: false,
+        err: err,
+        message: err.message,
+      }));
+    });
+
   }
 
   const account = accounts.find(a => a.accountId === statement.accountId);
@@ -469,27 +481,32 @@ function Upload22({ accountTypes, accounts, statement }) {
           </div>
         </div>
       </div>
-      <div className="d-flex mt-1 flex-sm-row-reverse align-items-center">
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={handleSubmit}
-          disabled={state.submitting}
-         >Post</button>
-        <div className="mx-2">
+      <div className="row flex-sm-row-reverse align-items-center">
+        <div className="col-sm-auto mt-1 align-self-start">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleSubmit}
+            disabled={state.submitting || state.submitted}
+           >Post</button>
+        </div>
+        <div className="col-sm-auto mt-1">
           {state.submitting ? (
             <div className="spinner-grow spinner-grow-sm text-primary" role="status">
               <span className="sr-only">Loading...</span>
             </div>
-          ) : (state.message && (
-            <div className={state.err ? "text-danger" : "text-success"}>
+          ) : state.err ? (
+            <div className="text-danger">
+              <strong>Oh sorrow!</strong> {state.message}
+            </div>
+          ) : (
+            <div className="text-success">
               {state.message}
             </div>
-          ))}
+          )}
         </div>
       </div>
-      <div><small>{JSON.stringify(state)}</small></div>
-      {/*<div className="mt-2"><small>{JSON.stringify(statement)}</small></div>*/}
+      <div><small>statement = {JSON.stringify(statement)}</small></div>
     </div>
   );
 }

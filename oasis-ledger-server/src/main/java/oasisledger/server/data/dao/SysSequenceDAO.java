@@ -31,6 +31,9 @@ public interface SysSequenceDAO {
     default long getPostingId() {
         return nextValue("posting", "posting_id");
     }
+    default long getStatementId() {
+        return nextValue("statement", "statement_id");
+    }
     default int getUserId() {
         return (int)nextValue("sys_user", "user_id");
     }

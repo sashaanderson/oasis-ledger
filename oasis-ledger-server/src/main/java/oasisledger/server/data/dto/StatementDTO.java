@@ -1,6 +1,7 @@
 package oasisledger.server.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
@@ -40,6 +41,11 @@ public class StatementDTO {
     private BigDecimal amount;
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    @JsonIgnore
+    private long rawAmount;
+    public long getRawAmount() { return rawAmount; }
+    public void setRawAmount(long rawAmount) { this.rawAmount = rawAmount; }
 
     @Pattern(regexp = "^\\p{Print}{0,128}$")
     @Size(max = 128)
