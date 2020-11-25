@@ -3,4 +3,5 @@
 /config.yml
 /log/
 /oasis-ledger-core.db
+/scripts/*.groovy
 /target/
