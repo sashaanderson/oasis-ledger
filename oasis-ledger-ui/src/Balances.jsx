@@ -58,7 +58,7 @@ class BalancesView extends React.Component {
     const balanceCurr = balances.length > 0 && balances[balances.length - 1];
     const balanceNext = balanceCurr && balanceCurr.postingDate < this.props.balancesDate &&
       Object.assign({},
-        ["accountId", "currencyId", "postingCount", "amount"]
+        ["accountId", "postingCount", "amount"]
           .reduce((a, key) => { a[key] = balanceCurr[key]; return a }, {}),
         { postingDate: this.props.balancesDate, reconciled: "N" });
     return (

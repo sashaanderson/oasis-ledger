@@ -22,7 +22,6 @@ const PostingsIndex = () => (
         <FetchContainer wait={false} fetch={{
           accountTypes: fetchJSON("api/account-type"),
           accounts: fetchJSON("api/account"),
-          currencies: fetchJSON("api/currency"),
         }}>
           <Post/>
         </FetchContainer>
@@ -143,7 +142,6 @@ class PostingsListing extends React.Component {
         */}
         <FetchContainer key={this.state.top.key} fetch={{
           accounts: fetchJSON("api/account"),
-          currencies: fetchJSON("api/currency"),
           postings: this.state.top.days
             ? fetchJSON("api/posting/top?days=" + this.state.top.days)
             : fetchJSON("api/posting/month?year=" + this.state.top.year + "&month=" + this.state.top.month)
@@ -239,7 +237,6 @@ class PostingsListingResults extends React.Component {
           )}
         {/*
         <p className="mt-3"><small>{JSON.stringify(this.props.postings)}</small></p>
-        <p className="mt-3"><small>{JSON.stringify(this.props.currencies)}</small></p>
         <p className="mt-3"><small>{JSON.stringify(this.props.accounts)}</small></p>
         */}
       </div>

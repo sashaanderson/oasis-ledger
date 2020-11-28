@@ -87,13 +87,11 @@ public class PostingResourceTest {
         pd = new PostingDTO.Detail();
         pd.setAccountId(a1.getAccountId());
         pd.setAmount(BigDecimal.valueOf(-1000));
-        pd.setCurrency("CAD");
         ph.getDetails().add(pd);
 
         pd = new PostingDTO.Detail();
         pd.setAccountId(a2.getAccountId());
         pd.setAmount(BigDecimal.valueOf(1000));
-        pd.setCurrency("CAD");
         ph.getDetails().add(pd);
 
         postingResource.post(ph);
@@ -136,13 +134,11 @@ public class PostingResourceTest {
         pd = new PostingDTO.Detail();
         pd.setAccountId(a1.getAccountId());
         pd.setAmount(BigDecimal.valueOf(-200));
-        pd.setCurrency("CAD");
         ph.getDetails().add(pd);
 
         pd = new PostingDTO.Detail();
         pd.setAccountId(a2.getAccountId());
         pd.setAmount(BigDecimal.valueOf(200));
-        pd.setCurrency("CAD");
         ph.getDetails().add(pd);
 
         postingResource.post(ph);

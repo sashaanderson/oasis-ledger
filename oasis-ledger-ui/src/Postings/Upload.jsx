@@ -35,26 +35,6 @@ function Upload1({ accountTypes, accounts, institutions, institutionLinks }) {
     bsCustomFileInput.init();
   });
 
-  /*
-  //XXX
-  const statements = [{"statementDate":"2020-09-11","accountId":33,"amount":-79.09,"description":"CDN TIRE STORE #00152 (Merchandise)","key":1},{"statementDate":"2020-09-10","accountId":33,"amount":-36.83,"description":"COSTCO GAS W1169 (Gas/Automotive)","key":2},{"statementDate":"2020-09-09","accountId":33,"amount":47.74,"description":"Amazon.ca*MU9W821T0 (Internet)","key":3},{"statementDate":"2020-09-07","accountId":33,"amount":-37.3,"description":"LCBO/RAO #0398 (Merchandise)","key":4},{"statementDate":"2020-09-07","accountId":33,"amount":-147.55,"description":"NOFRILLS MARCS 758 (Merchandise)","key":5},{"statementDate":"2020-09-07","accountId":33,"amount":-42.94,"description":"PARAMOUNT BUTCHER SHOP (Merchandise)","key":6}]
-  if (accounts && statements) {
-    //XXX
-    statements.forEach((statement, i) => {
-      statement.key = i + 1;
-      statement.account = accounts.find(a => a.accountId === statement.accountId);
-    });
-    return (
-      <Upload2
-        key={state.input.file}
-        accountTypes={accountTypes}
-        accounts={accounts}
-        statements={statements}
-      />
-    );
-  }
-  */
-
   if (state.statements) {
     return (
       <Upload2
@@ -383,18 +363,15 @@ function Upload22({ accountTypes, accounts, statement }) {
       details: [
         {
           accountId: statement.accountId,
-          currencyId: 6, //TODO
           amount: statement.amount,
           statement: {
             statementDate: statement.statementDate,
             accountId: statement.accountId,
-            currencyId: 6, //TODO
             amount: statement.amount,
             description: statement.description,
           }
         }, {
           accountId: state.input.account,
-          currencyId: 6, //TODO
           amount: -statement.amount,
         }
       ],

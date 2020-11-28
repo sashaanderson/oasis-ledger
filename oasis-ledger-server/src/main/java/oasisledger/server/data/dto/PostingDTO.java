@@ -63,17 +63,6 @@ public class PostingDTO {
         public int getAccountId() { return accountId; }
         public void setAccountId(int accountId) { this.accountId = accountId; }
 
-        private int currencyId;
-        public int getCurrencyId() { return currencyId; }
-        public void setCurrencyId(int currencyId) { this.currencyId = currencyId; }
-
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-        @Pattern(regexp = "^[A-Z]{3}$")
-        @Size(min = 3, max = 3)
-        private String currency;
-        public String getCurrency() { return currency; }
-        public void setCurrency(String currency) {  this.currency = currency; }
-
         @NotNull
         private BigDecimal amount;
         public BigDecimal getAmount() { return amount; }

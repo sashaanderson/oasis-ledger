@@ -32,20 +32,17 @@ public class AccountBalanceResource {
             "  and reconciled = 'Y'",
             "  group by account_id",
             ")",
-            "select ab.*, c.scale",
+            "select ab.*",
             "from account_balance ab",
-            "join currency c on c.currency_id = ab.currency_id",
             "join d1 on d1.account_id = ab.account_id",
             "left join d2 on d2.account_id = ab.account_id",
             "where ab.posting_date >= coalesce(d2.posting_date, d1.posting_date)",
-            "order by ab.account_id, ab.currency_id, ab.posting_date");
+            "order by ab.account_id, ab.posting_date");
 
     private static final String SQL_SELECT_ONE = String.join("\n",
-            "select ab.*, c.scale",
+            "select ab.*",
             "from account_balance ab",
-            "join currency c on c.currency_id = ab.currency_id",
             "where ab.account_id = :accountId",
-            "and ab.currency_id = :currencyId",
             "and ab.posting_date = :postingDate");
 
     private final Jdbi jdbi;
@@ -68,7 +65,7 @@ public class AccountBalanceResource {
                         .list()
         );
         rows.forEach(row -> {
-            row.setAmount(row.getAmount().movePointLeft(row.getScale()));
+            row.setAmount(row.getAmount().movePointLeft(2)); // scale = 2
         });
         return rows;
     }
@@ -78,28 +75,26 @@ public class AccountBalanceResource {
     public void reconcile(@NotNull @Valid AccountBalanceDTO ab1) {
         // if postingDate >= today, fail?
         int accountId = ab1.getAccountId();
-        int currencyId = ab1.getCurrencyId();
         LocalDate postingDate = ab1.getPostingDate();
         jdbi.useTransaction(TransactionIsolationLevel.SERIALIZABLE, h -> {
             AccountBalanceDAO abdao = h.attach(AccountBalanceDAO.class);
-            AccountBalanceDTO ab2 = selectOne(h, accountId, currencyId, postingDate);
+            AccountBalanceDTO ab2 = selectOne(h, accountId, postingDate);
             if (ab2 == null) {
-                abdao.addBalanceIfNotExists(ab1.getAccountId(), ab1.getCurrencyId(), ab1.getPostingDate());
-                ab2 = selectOne(h, accountId, currencyId, postingDate);
+                abdao.addBalanceIfNotExists(ab1.getAccountId(), ab1.getPostingDate());
+                ab2 = selectOne(h, accountId, postingDate);
                 if (ab2 == null) throw new AssertionError();
             }
-            ab2.setAmount(ab2.getAmount().movePointLeft(ab2.getScale()));
+            ab2.setAmount(ab2.getAmount().movePointLeft(2)); // scale = 2
             if (ab2.getAmount().compareTo(ab1.getAmount()) != 0) {
                 throw new BadRequestException("Can't reconcile if amounts don't match");
             }
-            abdao.reconcile(ab1.getAccountId(), ab1.getCurrencyId(), ab1.getPostingDate());
+            abdao.reconcile(ab1.getAccountId(), ab1.getPostingDate());
         });
     }
 
-    private AccountBalanceDTO selectOne(Handle h, int accountId, int currencyId, LocalDate postingDate) {
+    private AccountBalanceDTO selectOne(Handle h, int accountId, LocalDate postingDate) {
         return h.createQuery(SQL_SELECT_ONE)
                 .bind("accountId", accountId)
-                .bind("currencyId", currencyId)
                 .bind("postingDate", postingDate)
                 .mapToBean(AccountBalanceDTO.class)
                 .findFirst()

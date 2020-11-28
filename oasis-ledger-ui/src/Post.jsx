@@ -12,12 +12,9 @@ class Post extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDismiss = this.handleDismiss.bind(this);
 
-    this.defaultInput = {
-      inputCurrency: "CAD",
-    };
     this.state = {
       stateKey: 0,
-      input: this.defaultInput,
+      input: {},
       valid: null,
       running: false,
       message: null,
@@ -42,7 +39,7 @@ class Post extends React.Component {
   handleClear() {
     this.setState(prevState => ({
       stateKey: prevState.stateKey + 1,
-      input: this.defaultInput,
+      input: {},
       valid: null,
       message: null,
     }));
@@ -56,7 +53,6 @@ class Post extends React.Component {
 
     const valid = {
       inputDate: inputDate.isValid(),
-      inputCurrency: !!input.inputCurrency,
       inputAmount: !!input.inputAmount && /^(\d+(,\d\d\d)*)?(\.\d+)?$/.test(input.inputAmount),
       inputAccountFrom: !!input.inputAccountFrom,
       inputAccountTo: !!input.inputAccountTo,
@@ -74,11 +70,9 @@ class Post extends React.Component {
       details: [
         {
           accountId: input.inputAccountFrom,
-          currency: input.inputCurrency,
           amount: "-" + inputAmount,
         }, {
           accountId: input.inputAccountTo,
-          currency: input.inputCurrency,
           amount: inputAmount,
         },
       ],
@@ -131,18 +125,6 @@ class Post extends React.Component {
           </div>
           <div className="col mb-2">
             <div className="input-group flex-nowrap">
-              <select
-                className="custom-select flex-grow-0 w-auto"
-                id="inputCurrency"
-                onChange={this.handleChange}
-                value={this.getInput("inputCurrency")}
-                style={{minWidth: "5.3em"}}
-               >{this.props.currencies && this.props.currencies
-                  .sort((a, b) => a.currencyCode.localeCompare(b.currencyCode))
-                  .map(c =>
-                    <option>{c.currencyCode}</option>
-                  )}
-              </select>
               <input
                 type="text"
                 className={"form-control" + (this.state.valid

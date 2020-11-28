@@ -19,8 +19,8 @@ public interface PostingDAO extends SqlObject {
             + "values (:postingHeaderId, :postingDate, :description)")
     void insertPostingHeader(@BindBean PostingDTO.Header ph);
 
-    @SqlUpdate("insert into posting_detail (posting_detail_id, posting_header_id, account_id, currency_id, amount, statement_id) "
-            + "values (:postingDetailId, :postingHeaderId, :accountId, :currencyId, :rawAmount, :statementId)")
+    @SqlUpdate("insert into posting_detail (posting_detail_id, posting_header_id, account_id, amount, statement_id) "
+            + "values (:postingDetailId, :postingHeaderId, :accountId, :rawAmount, :statementId)")
     void insertPostingDetail(@BindBean PostingDTO.Detail ph);
 
 }

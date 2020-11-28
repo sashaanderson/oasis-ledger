@@ -13,10 +13,6 @@ public class AccountBalanceDTO {
     public int getAccountId() { return accountId; }
     public void setAccountId(int accountId) { this.accountId = accountId; }
 
-    private int currencyId;
-    public int getCurrencyId() { return currencyId; }
-    public void setCurrencyId(int currencyId) { this.currencyId = currencyId; }
-
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @NotNull
     private LocalDate postingDate;
@@ -26,11 +22,6 @@ public class AccountBalanceDTO {
     private int postingCount;
     public int getPostingCount() { return postingCount; }
     public void setPostingCount(int postingCount) { this.postingCount = postingCount; }
-
-    @JsonIgnore
-    private int scale;
-    public void setScale(int scale) { this.scale = scale; }
-    public int getScale() { return scale; }
 
     @NotNull
     private BigDecimal amount;

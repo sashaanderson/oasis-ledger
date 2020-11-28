@@ -13,7 +13,7 @@ public class PostingReducer implements LinkedHashMapRowReducer<Long, PostingDTO.
         PostingDTO.Header ph = map.computeIfAbsent(rowView.getColumn("posting_header_id", Long.class),
                 id -> rowView.getRow(PostingDTO.Header.class));
         PostingDTO.Detail pd = rowView.getRow(PostingDTO.Detail.class);
-        pd.setAmount(pd.getAmount().movePointLeft(rowView.getColumn("scale", Integer.class)));
+        pd.setAmount(pd.getAmount().movePointLeft(2)); // scale = 2
         ph.getDetails().add(pd);
 
         Long sid = rowView.getColumn("statement_id", Long.class);

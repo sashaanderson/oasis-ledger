@@ -1,7 +1,6 @@
 package oasisledger.server.data.repo;
 
 import oasisledger.server.data.dao.*;
-import oasisledger.server.data.dto.CurrencyDTO;
 import oasisledger.server.data.dto.PostingDTO;
 import oasisledger.server.data.dto.StatementDTO;
 import oasisledger.server.data.mappers.PostingReducer;
@@ -35,28 +34,9 @@ public class PostingRepo {
             throw new IllegalArgumentException("Missing posting details");
         }
         ph.getDetails().forEach(pd -> {
-            CurrencyDTO c;
-            if (pd.getCurrency() != null) {
-                c = jdbi.withExtension(CurrencyDAO.class, dao -> dao.findByCode(pd.getCurrency()));
-                if (c == null)
-                    throw new IllegalArgumentException("Invalid currency: " + pd.getCurrency());
-                if (pd.getCurrencyId() == 0)
-                    pd.setCurrencyId(c.getCurrencyId());
-                else if (pd.getCurrencyId() != c.getCurrencyId())
-                    throw new IllegalArgumentException("Conflicting currency and currencyId");
-            } else {
-                if (pd.getCurrencyId() == 0)
-                    throw new IllegalArgumentException("Missing currency");
-                c = jdbi.withExtension(CurrencyDAO.class, dao -> dao.findById(pd.getCurrencyId()));
-                if (c == null)
-                    throw new IllegalArgumentException("Invalid currencyId: " + pd.getCurrencyId());
-                pd.setCurrency(c.getCurrencyCode());
-            }
-
-            BigDecimal rawAmount = pd.getAmount().movePointRight(c.getScale());
+            BigDecimal rawAmount = pd.getAmount().movePointRight(2); // scale = 2
             if (rawAmount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0)
-                throw new IllegalArgumentException("Invalid fractional amount for currency "
-                        + c.getCurrencyCode() + ": " + pd.getAmount());
+                throw new IllegalArgumentException("Invalid fractional amount: " + pd.getAmount());
             pd.setRawAmount(rawAmount.longValue());
         });
 
@@ -65,11 +45,7 @@ public class PostingRepo {
             throw new IllegalArgumentException("Invalid posting date: " + ph.getPostingDate());
         }
 
-        long countCurrencies = ph.getDetails().stream().map(pd -> pd.getCurrencyId()).distinct().count();
-        if (countCurrencies > 2) {
-            throw new IllegalArgumentException("Invalid posting with " + countCurrencies + " currencies");
-        }
-        if (countCurrencies == 1) {
+        {
             BigDecimal total = ph.getDetails().stream()
                     .map(pd -> pd.getAmount())
                     .reduce((a, b) -> a.add(b))
@@ -99,13 +75,6 @@ public class PostingRepo {
                     s.setAccountId(pd.getAccountId());
                 else if (s.getAccountId() != pd.getAccountId())
                     throw new IllegalArgumentException("Statement and posting accounts must be same");
-
-                if (s.getCurrency() != null && !s.getCurrency().equals(pd.getCurrency()))
-                    throw new IllegalArgumentException("Statement and posting currency must be same");
-                if (s.getCurrencyId() == 0)
-                    s.setCurrencyId(pd.getCurrencyId());
-                else if (s.getCurrencyId() != pd.getCurrencyId())
-                    throw new IllegalArgumentException("Statement and posting currency id must be same");
 
                 if (!s.getAmount().equals(pd.getAmount()))
                     throw new IllegalArgumentException("Statement and posting amount must be same");
@@ -141,7 +110,7 @@ public class PostingRepo {
                 pdao.insertPostingDetail(pd);
 
                 if (pd.getStatement() == null && pd.getStatementId() != null) {
-                    if (!sdao.setPosted(pd.getStatementId(), pd.getAccountId(), pd.getCurrencyId())) {
+                    if (!sdao.setPosted(pd.getStatementId(), pd.getAccountId())) {
                         throw new BadRequestException("Failed to link posting detail to statement id "
                                 + pd.getStatementId());
                     }
@@ -150,8 +119,8 @@ public class PostingRepo {
 
             AccountBalanceDAO abdao = h.attach(AccountBalanceDAO.class);
             ph.getDetails().forEach(pd -> {
-                abdao.addBalanceIfNotExists(pd.getAccountId(), pd.getCurrencyId(), ph.getPostingDate());
-                abdao.addPosting(pd.getAccountId(), pd.getCurrencyId(), ph.getPostingDate(), pd.getRawAmount());
+                abdao.addBalanceIfNotExists(pd.getAccountId(), ph.getPostingDate());
+                abdao.addPosting(pd.getAccountId(), ph.getPostingDate(), pd.getRawAmount());
             });
         });
     }
@@ -197,16 +166,13 @@ public class PostingRepo {
                 "  ph.description,",
                 "  pd.posting_detail_id,",
                 "  pd.account_id,",
-                "  pd.currency_id,",
                 "  pd.amount,",
                 "  pd.statement_id,",
-                "  c.scale,",
                 "  ph.audit_user_id,",
                 "  ph.audit_ts,",
                 "  s.statement_id s_statement_id,",
                 "  s.statement_date s_statement_date,",
                 "  s.account_id s_account_id,",
-                "  s.currency_id s_currency_id,",
                 "  s.amount s_amount,",
                 "  s.description s_description,",
                 "  s.posted s_posted",
@@ -217,8 +183,6 @@ public class PostingRepo {
                 ") ph",
                 "join posting_detail pd",
                 "  on pd.posting_header_id = ph.posting_header_id",
-                "join currency c",
-                "  on c.currency_id = pd.currency_id",
                 "left join statement s",
                 "  on s.statement_id = pd.statement_id",
                 "order by ph.posting_date desc, ph.posting_header_id desc, pd.posting_detail_id",
