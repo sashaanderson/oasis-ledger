@@ -1,90 +1,88 @@
 import React from 'react';
-import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { HashRouter, Link } from 'react-router-dom';
 
-import Balances from './Balances';
-import ErrorBoundary from './ErrorBoundary';
-import Postings from './Postings';
-import Settings from './Settings';
-import Sidebar from './Sidebar';
+import AccountSelect from 'util/AccountSelect';
+import FetchContainer, { fetchJSON } from 'util/FetchContainer';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showMobileSidebar: false,
-    };
-    this.handleFocus = this.handleFocus.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-  }
-
-  handleFocus() {
-    clearTimeout(this.showMobileSidebarTimeoutId);
-  }
-
-  handleClick(e) {
-    e.preventDefault();
-    this.setState(prevState => ({ showMobileSidebar: !prevState.showMobileSidebar }));
-  }
-
-  handleBlur() {
-    this.showMobileSidebarTimeoutId = setTimeout(() => {
-      if (this.state.showMobileSidebar) {
-        this.setState({ showMobileSidebar: false });
-      }
-    });
-  }
-
-  render() {
-    return (
+function App() {
+  return (
+    <HashRouter>
       <div className="oasisledger-root">
-        <header>
-          <div className="oasisledger-logo">
-            <div className="oasisledger-logo__content">
-              Oasis Ledger
-            </div>
-          </div>
-          <div className="oasisledger-navbar">
-            <a href="#"
-              className="oasisledger-navbar__sidebar-toggle"
-              onClick={this.handleClick}
-              onFocus={this.handleFocus}
-              onBlur={this.handleBlur}
-             ><i className="fa fa-bars" aria-hidden="true"></i>
-            </a>
-            <div className="oasisledger-logo-mobile">
-              Oasis Ledger
+        <header className="py-2">
+          <div className="container-xxl">
+            <div className="d-flex align-items-center">
+              <Link to="/" className="oasisledger-brand">
+                <img src="favicon.svg" width="30" height="30" className="me-2"/>
+                <span className="align-middle fw-bold">Oasis Ledger</span>
+              </Link>
             </div>
           </div>
         </header>
-        <HashRouter>
-          <div
-            className={"oasisledger-content" + (this.state.showMobileSidebar
-              ? " oasisledger-content--show-mobile-sidebar"
-              : "")}>
-            <Route path="/"
-              render={(routeProps) => (
-                <Sidebar {...routeProps}
-                  onFocus={this.handleFocus}
-                  onBlur={this.handleBlur}
-                />
-              )}
-            />
-            <main className="oasisledger-main">
-              <ErrorBoundary>
-                <Switch>
-                  <Redirect exact from="/" to="/postings"/>
-                  <Route path="/postings" component={Postings}/>
-                  <Route path="/balances" component={Balances}/>
-                  <Route path="/settings" component={Settings}/>
-                </Switch>
-              </ErrorBoundary>
-            </main>
+        <main className="my-4">
+          <div className="container-xxl">
+            <div className="row row-cols-auto mb-5">
+              <div className="col">
+                <Link to="/post" className="btn btn-success" role="button">
+                  <i className="bi bi-plus-lg"></i> Post
+                </Link>
+              </div>
+              <div className="col">
+                <button type="button" className="btn btn-outline-success">
+                  <i className="bi bi-upload"></i> Bulk Import
+                </button>
+              </div>
+            </div>
+            {/*
+            <div className="mb-4 d-flex align-items-center">
+              Post:
+              <button type="button" className="btn btn-outline-success">New quick entry</button>
+              <button type="button" className="btn btn-outline-success">New split entry</button>
+              <button type="button" className="btn btn-outline-success">Upload from file</button>
+            </div>
+
+            <div className="mb-5">
+              {JSON.stringify(d3.range(10))}
+            </div>
+            */}
+
+            <Post/>
+
+            <br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>
+            <br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>
+            <br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>
+
+            <Post/>
+
+            <br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>
+            <br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>.<br/>
+
           </div>
-        </HashRouter>
+        </main>
       </div>
+    </HashRouter>
+  );
+}
+
+function Post({ accountTypes, accounts, fetched = false }) {
+  if (!fetched) {
+    return (
+      <FetchContainer wait={false} fetch={{
+        accountTypes: fetchJSON("api/account-type"),
+        accounts: fetchJSON("api/account"),
+      }}>
+        <Post fetched={true}/>
+      </FetchContainer>
     );
   }
+  return (
+    <div>
+      <form>
+        <AccountSelect label="From" accountTypes={accountTypes} accounts={accounts}/>
+        <br/><br/>
+        <AccountSelect label="To" accountTypes={accountTypes} accounts={accounts}/>
+      </form>
+    </div>
+  );
 }
 
 export default App;

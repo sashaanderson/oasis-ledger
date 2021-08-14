@@ -123,8 +123,8 @@ public class UploadResource {
                 throw new IllegalArgumentException("Can't find any institution links for institution id " + institutionId);
             args = new String[links.size()];
             for (int i = 0; i < args.length; i++) {
-                args[i] = links.get(i).get("account_id").toString();
-                String reference = links.get(i).get("reference").toString();
+                args[i] = links.get(i).get("accountId").toString();
+                String reference = (String)links.get(i).get("reference");
                 if (reference != null && !reference.isBlank())
                     args[i] += (":" + reference);
             }
