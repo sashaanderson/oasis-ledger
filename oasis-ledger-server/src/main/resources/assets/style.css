@@ -23,3 +23,14 @@ body {
 .oasisledger-brand:hover {
   color: var(--oasisledger-color-accent);
 }
+
+.oasisledger-datepicker-head {
+  display: inline-block;
+  width: 2.375em;
+  text-align: center;
+  color: var(--oasisledger-color-secondary-text);
+}
+.oasisledger-datepicker-cell {
+  width: 2.375em;
+  padding: .375rem;
+}

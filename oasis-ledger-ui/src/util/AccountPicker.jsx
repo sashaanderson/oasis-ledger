@@ -2,26 +2,41 @@ import React, { useState, useRef } from 'react';
 
 import { emsp } from 'util/unicode';
 
-function AccountSelect({ label, accountTypes, accounts }) {
+function AccountPicker({ accountTypes, accounts, onPick }) {
   const [text, setText] = useState("");
   const [selectedAccountId, setSelectedAccountId] = useState(0);
   const inputRef = useRef(null);
 
+  function setAccount(account, setTextFlag = false) {
+    setSelectedAccountId(account.accountId);
+    if (setTextFlag) {
+      setText(account.accountCode + " - " + account.accountName);
+    }
+    if (!selectedAccountId || selectedAccountId !== account.accountId) {
+      onPick(account.accountId);
+    }
+  }
+
   function handleChange(e) {
     const text = e.target.value;
-    const account = accounts && accounts.find(a => text == a.accountCode + " - " + a.accountName);
     setText(text);
-    setSelectedAccountId(account && account.accountId);
+    const account = accounts && accounts.find(a => text == a.accountCode + " - " + a.accountName);
+    if (account) {
+      setAccount(account, false);
+    } else {
+      setSelectedAccountId(0);
+      if (selectedAccountId)
+        onPick(undefined);
+    }
 
     const dropdown = bootstrap.Dropdown.getOrCreateInstance(inputRef.current);
     dropdown.show();
   }
 
-  function handleClick(accountId, e) {
+  function handleClick(e, accountId) {
     e.preventDefault();
     const account = accounts.find(a => a.accountId === accountId);
-    setText(account.accountCode + " - " + account.accountName);
-    setSelectedAccountId(account.accountId);
+    setAccount(account, true);
     inputRef.current.focus();
   }
 
@@ -73,7 +88,7 @@ function AccountSelect({ label, accountTypes, accounts }) {
         <li>
           <a className={"dropdown-item" + (active ? " active" : "")}
             href="#"
-            onClick={e => handleClick(account.accountId, e)}
+            onClick={e => handleClick(e, account.accountId)}
            >{emsp.repeat(depth)}
             {active ? label : renderLabel(label)}
           </a>
@@ -152,28 +167,20 @@ function AccountSelect({ label, accountTypes, accounts }) {
   }
 
   return (
-    <div className="row mb-3 g-3 align-items-center">
-      <div className="col-auto" style={{minWidth: "4em"}}>{label}:</div>
-      <div className="col-auto px-0">
-        <div className="dropdown">
-          <input type="text"
-            className="form-control"
-            placeholder="Select account..."
-            aria-label="Select account..."
-            size="50"
-            data-bs-toggle="dropdown" 
-            value={text}
-            onChange={handleChange}
-            ref={inputRef}
-          />
-          {renderDropdownMenu()}
-        </div>
-      </div>
-      <div className="col-auto">
-        <i className={"bi bi-check2 " + (selectedAccountId ? "text-success" : "invisible")}></i>
-      </div>
+    <div className="dropdown">
+      <input type="text"
+        className="form-control"
+        placeholder="Select account..."
+        aria-label="Select account..."
+        size="50"
+        data-bs-toggle="dropdown" 
+        value={text}
+        onChange={handleChange}
+        ref={inputRef}
+      />
+      {renderDropdownMenu()}
     </div>
   );
 }
 
-export default AccountSelect;
+export default AccountPicker;
