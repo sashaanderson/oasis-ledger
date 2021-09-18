@@ -1,17 +1,31 @@
-import React, { useState, useRef } from 'react';
-//import PropTypes from 'prop-types';
+import React, { useEffect, useState, useRef } from 'react';
 
 const FIRST_DAY_OF_WEEK = 0; // 0=Sunday, 6=Saturday
 
-function DatePicker({ onPick }) {
-  const [text, setText] = useState("");
-  const inputRef = useRef(null);
-
+function DatePicker({ id, initialDate, onPick, valid }) {
   const today = moment().startOf("day");
 
-  const [firstDate, setFirstDate] = useState(moment(today).startOf("month"));
+  let initialText = "";
+  if (initialDate) {
+    if (initialDate === true)
+      initialDate = today;
+    initialText = initialDate.format("M/D/YYYY");
+  }
+  useEffect(() => {
+    if (initialDate)
+      onPick(initialDate.format("YYYY-MM-DD"));
+  }, [initialText]);
+
+  //const renderCount = useRef(1);
+  //console.log("DatePicker render " + renderCount.current);
+  //renderCount.current++;
+
+  const [text, setText] = useState(initialText);
+  const inputRef = useRef(null);
+
+  const [firstDate, setFirstDate] = useState(moment(initialDate || today).startOf("month"));
   const [hoverDate, setHoverDate] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(initialDate);
 
   function setDate(m, setTextFlag = false) {
     setFirstDate(moment(m).startOf("month"))
@@ -37,8 +51,10 @@ function DatePicker({ onPick }) {
         onPick(undefined);
     }
 
-    const dropdown = bootstrap.Dropdown.getOrCreateInstance(inputRef.current);
-    dropdown.show();
+    setTimeout(function() {
+      const dropdown = bootstrap.Dropdown.getOrCreateInstance(inputRef.current);
+      dropdown.show();
+    }, 0);
   }
 
   function handleClick(e, arg) {
@@ -66,13 +82,27 @@ function DatePicker({ onPick }) {
       setFirstDate(m);
   }
 
+  function handleKeyDown(e) {
+    if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+      if (selectedDate) {
+        let d;
+        if (e.code === "ArrowLeft") d = -1;
+        if (e.code === "ArrowRight") d = 1;
+        setDate(moment(selectedDate).add(d, "d"), true);
+        e.preventDefault();
+      } else if (text === "") {
+        setDate(today, true);
+      }
+    }
+  }
+
   function renderPickButton(m) {
     let btnClass, textClass;
-    if (m.isSame(hoverDate)) {
+    if (hoverDate && m.isSame(hoverDate)) {
       btnClass = "btn-outline-warning";
-    } else if (m.isSame(selectedDate) && m.isSame(today)) {
+    } else if (selectedDate && m.isSame(selectedDate) && m.isSame(today)) {
       btnClass = "btn-primary";
-    } else if (m.isSame(selectedDate)) {
+    } else if (selectedDate && m.isSame(selectedDate)) {
       btnClass = "btn-warning";
     } else if (m.isSame(today)) {
       btnClass = "btn-outline-primary";
@@ -139,15 +169,18 @@ function DatePicker({ onPick }) {
 
   return (
     <div className="dropdown">
-      <input type="text"
-        className="form-control"
+      <input
+        type="text"
+        className={"form-control" + (valid === undefined || valid ? "" : " is-invalid")}
+        id={id}
         placeholder="MM/DD/YYYY"
         style={{maxWidth: "9.5em"}}
-        data-bs-toggle="dropdown" 
+        data-bs-toggle="dropdown"
         data-bs-auto-close="outside"
         value={text}
         onChange={handleChange}
         onClick={handleDropdownToggle}
+        onKeyDown={handleKeyDown}
         ref={inputRef}
       />
       {renderDropdownMenu()}

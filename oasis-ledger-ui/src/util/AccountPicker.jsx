@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 
 import { emsp } from 'util/unicode';
 
-function AccountPicker({ accountTypes, accounts, onPick }) {
+function AccountPicker({ id, accountTypes, accounts, onPick, valid }) {
   const [text, setText] = useState("");
   const [selectedAccountId, setSelectedAccountId] = useState(0);
   const inputRef = useRef(null);
@@ -29,14 +29,19 @@ function AccountPicker({ accountTypes, accounts, onPick }) {
         onPick(undefined);
     }
 
-    const dropdown = bootstrap.Dropdown.getOrCreateInstance(inputRef.current);
-    dropdown.show();
+    setTimeout(function() {
+      const dropdown = bootstrap.Dropdown.getOrCreateInstance(inputRef.current);
+      dropdown.show();
+    }, 0);
   }
 
   function handleClick(e, accountId) {
     e.preventDefault();
     const account = accounts.find(a => a.accountId === accountId);
     setAccount(account, true);
+
+    const dropdown = bootstrap.Dropdown.getInstance(inputRef.current);
+    dropdown.hide();
     inputRef.current.focus();
   }
 
@@ -119,15 +124,13 @@ function AccountPicker({ accountTypes, accounts, onPick }) {
             .concat(findDescendants(accountId)), [])
         )].map(accountId => accounts.find(account => account.accountId === accountId));
       accountTypesInDropdown = accountTypes.filter(accountType =>
-        accounts.some(account => account.accountTypeId === accountType.accountTypeId));
+        accountsInDropdown.some(account => account.accountTypeId === accountType.accountTypeId));
     } else {
       accountsInDropdown = accounts;
       accountTypesInDropdown = accountTypes;
     }
     if (accountsInDropdown.length == 0 || accountTypesInDropdown.length == 0) {
-      return (
-        <li><h6 className="dropdown-header">Account(s) not found</h6></li>
-      );
+      return null;
     }
     return (
       accountTypesInDropdown.map(accountType => (
@@ -158,10 +161,12 @@ function AccountPicker({ accountTypes, accounts, onPick }) {
   }
 
   function renderDropdownMenu() {
+    const dropdownMenuItems = renderDropdownMenuItems();
     return (
-      <ul className={"dropdown-menu dropdown-menu-end"}
+      <ul className={"dropdown-menu dropdown-menu-end" + (dropdownMenuItems ? "" : " invisible")}
+          tabIndex="-1"
           style={{maxHeight: "45vh", overflowY: "auto", minWidth: "100%"}}>
-        {renderDropdownMenuItems()}
+        {dropdownMenuItems}
       </ul>
     );
   }
@@ -169,11 +174,11 @@ function AccountPicker({ accountTypes, accounts, onPick }) {
   return (
     <div className="dropdown">
       <input type="text"
-        className="form-control"
+        className={"form-control" + (valid === undefined || valid ? "" : " is-invalid")}
+        id={id}
         placeholder="Select account..."
         aria-label="Select account..."
-        size="50"
-        data-bs-toggle="dropdown" 
+        data-bs-toggle="dropdown"
         value={text}
         onChange={handleChange}
         ref={inputRef}
